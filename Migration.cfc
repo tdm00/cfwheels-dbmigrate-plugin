@@ -178,6 +178,8 @@
 					loc.columnValues = ListAppend(loc.columnValues,arguments[loc.key]);
 				} else if(IsBoolean(arguments[loc.key])) {
 					loc.columnValues = ListAppend(loc.columnValues,IIf(arguments[loc.key],1,0));
+				} else if(IsDate(arguments[loc.key])) {
+					loc.columnValues = ListAppend(loc.columnValues,"#arguments[loc.key]#");
 				} else {
 					loc.columnValues = ListAppend(loc.columnValues,"'#arguments[loc.key]#'");
 				}
