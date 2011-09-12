@@ -4,7 +4,7 @@
 		<cfscript>
 		var dbType = $getDBType();
 		if(dbType == '') {
-			$throw(type="Plugins.DBMigrate.DatabaseNotSupported", message="#dbType# is not supported by DBMigrate plugin.", extendedInfo="Use Microsoft SQL Server, MySQL, Oracle, SQLite or PostgreSQL.");
+			$throw(type="Plugins.dbmigrate.DatabaseNotSupported", message="#dbType# is not supported by DBMigrate plugin.", extendedInfo="Use Microsoft SQL Server, MySQL, Oracle, SQLite or PostgreSQL.");
 		} else {
 			this.adapter = CreateObject("component","adapters.#dbType#");
 		}

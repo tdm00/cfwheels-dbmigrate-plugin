@@ -44,7 +44,7 @@
 		</condition>
 		<fail if="do.abort">A version number is required, build aborted.</fail>		
 	  
-    <zip destfile="${cfwheels.plugindir}/DBMigrate-${plugin.version}.zip"
+    <zip destfile="${cfwheels.plugindir}/dbmigrate-${plugin.version}.zip"
       basedir="."
       excludes="build.xml,build.properties"
       update="true" />
