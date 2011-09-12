@@ -47,7 +47,7 @@
     <zip destfile="${cfwheels.plugindir}/dbmigrate-${plugin.version}.zip"
       basedir="."
       excludes="build.xml,build.properties"
-      update="true" />
+      update="false" />
 
 		<echo></echo>
 		<echo>Remember to reload the application</echo>
