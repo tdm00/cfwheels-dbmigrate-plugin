@@ -6,13 +6,13 @@ This is a plugin for the ColdFusion on Wheels framework that provides support fo
 
 ## The Latest Version
 The latest version of this script can always be found at the
-Github project page which is located at https://github.com/talltroym/cfwheels-dbmigrations-plugin
+Github project page which is located at https://github.com/talltroym/cfwheels-dbmigrate-plugin
 
 ## Documentation
-Additional documentation for this project can be found at https://github.com/talltroym/cfwheels-dbmigrations-plugin/wiki
+Additional documentation for this project can be found at https://github.com/talltroym/cfwheels-dbmigrate-plugin/wiki
 
 ## Issues
-Problems or issues with this software, as well as new features or enhancements to existing features, can be found at https://github.com/talltroym/cfwheels-dbmigrations-plugin/issues
+Problems or issues with this software, as well as new features or enhancements to existing features, can be found at https://github.com/talltroym/cfwheels-dbmigrate-plugin/issues
 
 ## Versioning
 I will be maintaining this application using the following release numbering format:
@@ -34,7 +34,6 @@ I have tested this plugin on the following CFML Engines:
 Once you have one a CFML engine correctly configured and operating on your system, you can place this plugin into your /plugins directory that's found in the root of your ColdFusion on Wheels application.
 
 ## License
-
 Since this is a fork of the existing DBMigrate plugin found at http://code.google.com/p/cfwheels-dbmigrate/ I'm including the license information used for that project.
 (The MIT License)
 
