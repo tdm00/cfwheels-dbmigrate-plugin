@@ -60,8 +60,16 @@
 <cffunction name="$getColumns" returntype="string" access="public" output="false">
 	<cfargument name="tableName" type="string" required="yes" hint="table name">
 	<cfset var loc = {}>
-	<!--- use cfdbinfo --->
-	<cfset loc.columns = $dbinfo(type="columns",table=arguments.tableName,datasource=application.wheels.dataSourceName,username=application.wheels.dataSourceUserName,password=application.wheels.dataSourcePassword)>
+  	<cfif $getDBType() eq "Oracle">
+  		<!--- oracle thin client jdbc throws error when usgin cfdbinfo to access column data --->
+  		<!--- because of this error wheels can't load models anyway so maybe we don't need to support this driver --->
+  		<cfquery name="loc.columns" datasource="#application.wheels.dataSourceName#" username="#application.wheels.dataSourceUserName#" password="#application.wheels.dataSourcePassword#">
+  		SELECT COLUMN_NAME FROM ALL_TAB_COLUMNS WHERE TABLE_NAME = '#this.name#'
+  		</cfquery>
+  	<cfelse>
+  		<!--- use cfdbinfo --->
+  		<cfset loc.columns = $dbinfo(type="columns",table=arguments.tableName,datasource=application.wheels.dataSourceName,username=application.wheels.dataSourceUserName,password=application.wheels.dataSourcePassword)>
+  	</cfif>
 	<cfreturn ValueList(loc.columns.COLUMN_NAME)>
 </cffunction>
 
