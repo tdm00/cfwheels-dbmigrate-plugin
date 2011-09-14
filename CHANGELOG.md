@@ -1,9 +1,15 @@
 # Changelog
 
+* 0.8.0
+  * Incorporated code changes from Raul Riera, specifically:
+    * Add Oracle code specific block to basefunctions.cfm
+    * Add transaction wrapping in dbmigrate.cfc
+    * Add foreign key column removal when dropping a table in migration.cfc
+  
 * 0.7.2
   * Update README.md with renamed project URL's
   * Create CHANGELOG.md file
-  
+
 * 0.7.1
   * Renamed references to DBMigrate to be dbmigrate to resolve a problem with case-sensitive file-systems, such as *nix
 
