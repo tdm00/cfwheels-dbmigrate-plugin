@@ -25,19 +25,23 @@
 					<cfset loc.migration = loc.migrations[loc.i]>
 					<cfif loc.migration.version lte arguments.version><cfbreak></cfif>
 					<cfif loc.migration.status eq "migrated">
-						<cftry>
-							<cfset loc.feedback = loc.feedback & "#chr(13)#------- " & loc.migration.cfcfile & " #RepeatString("-",Max(5,50-Len(loc.migration.cfcfile)))##chr(13)#">
-							<cfset Request.migrationOutput = "">
-							<cfset Request.migrationSQLFile = "#loc.sqlPath#/#loc.migration.cfcfile#_down.sql">
-							<cffile action="write" file="#Request.migrationSQLFile#" output="">
-							<cfset loc.migration.cfc.down()>
-							<cfset loc.feedback = loc.feedback & Request.migrationOutput>
-							<cfset $removeVersionAsMigrated(loc.migration.version)>
-							<cfcatch type="any">
-								<cfset loc.feedback = loc.feedback & "Error migrating to #loc.migration.version#.#chr(13)##CFCATCH.Message##chr(13)##CFCATCH.Detail##chr(13)#">
-								<cfbreak>
-							</cfcatch>
-						</cftry>
+					  <cftransaction action="begin">
+  						<cftry>
+  							<cfset loc.feedback = loc.feedback & "#chr(13)#------- " & loc.migration.cfcfile & " #RepeatString("-",Max(5,50-Len(loc.migration.cfcfile)))##chr(13)#">
+  							<cfset Request.migrationOutput = "">
+  							<cfset Request.migrationSQLFile = "#loc.sqlPath#/#loc.migration.cfcfile#_down.sql">
+  							<cffile action="write" file="#Request.migrationSQLFile#" output="">
+  							<cfset loc.migration.cfc.down()>
+  							<cfset loc.feedback = loc.feedback & Request.migrationOutput>
+  							<cfset $removeVersionAsMigrated(loc.migration.version)>
+  							<cfcatch type="any">
+  								<cfset loc.feedback = loc.feedback & "Error migrating to #loc.migration.version#.#chr(13)##CFCATCH.Message##chr(13)##CFCATCH.Detail##chr(13)#">
+  								<cftransaction action="rollback" />
+  								<cfbreak>
+  							</cfcatch>
+  						</cftry>
+  						<cftransaction action="commit" />
+						</cftransaction>
 					</cfif>
 				</cfloop>
 			<cfelse>
@@ -45,19 +49,23 @@
 				<cfloop index="loc.i" from="1" to="#ArrayLen(loc.migrations)#">
 					<cfset loc.migration = loc.migrations[loc.i]>
 					<cfif loc.migration.version lte arguments.version and loc.migration.status neq "migrated">
-						<cftry>
-							<cfset loc.feedback = loc.feedback & "#chr(13)#-------- " & loc.migration.cfcfile & " #RepeatString("-",Max(5,50-Len(loc.migration.cfcfile)))##chr(13)#">
-							<cfset Request.migrationOutput = "">
-							<cfset Request.migrationSQLFile = "#loc.sqlPath#/#loc.migration.cfcfile#_up.sql">
-							<cffile action="write" file="#Request.migrationSQLFile#" output="">
-							<cfset loc.migration.cfc.up()>
-							<cfset loc.feedback = loc.feedback & Request.migrationOutput>
-							<cfset $setVersionAsMigrated(loc.migration.version)>
-							<cfcatch type="any">
-								<cfset loc.feedback = loc.feedback & "Error migrating to #loc.migration.version#.#chr(13)##CFCATCH.Message##chr(13)##CFCATCH.Detail##chr(13)#">
-								<cfbreak>
-							</cfcatch>
-						</cftry>
+					  <cftransaction action="begin">
+  						<cftry>
+  							<cfset loc.feedback = loc.feedback & "#chr(13)#-------- " & loc.migration.cfcfile & " #RepeatString("-",Max(5,50-Len(loc.migration.cfcfile)))##chr(13)#">
+  							<cfset Request.migrationOutput = "">
+  							<cfset Request.migrationSQLFile = "#loc.sqlPath#/#loc.migration.cfcfile#_up.sql">
+  							<cffile action="write" file="#Request.migrationSQLFile#" output="">
+  							<cfset loc.migration.cfc.up()>
+  							<cfset loc.feedback = loc.feedback & Request.migrationOutput>
+  							<cfset $setVersionAsMigrated(loc.migration.version)>
+  							<cfcatch type="any">
+  								<cfset loc.feedback = loc.feedback & "Error migrating to #loc.migration.version#.#chr(13)##CFCATCH.Message##chr(13)##CFCATCH.Detail##chr(13)#">
+  								<cftransaction action="rollback" />
+                  <cfbreak>
+  							</cfcatch>
+  						</cftry>
+							<cftransaction action="commit" />
+						</cftransaction>
 					<cfelseif loc.migration.version gt arguments.version>
 						<cfbreak>			
 					</cfif>
@@ -166,6 +174,8 @@
 		<cftry>
 			<cffile action="read" file="#loc.templateFile#" variable="loc.templateContent">
 
+			<!--- TODO: need to determine if app sits in subfolder under webroot and needs different extends path --->
+			
 			<cfset loc.templateContent = replace(loc.templateContent, "[extends]", "plugins.dbmigrate.Migration")>
 			<cfset loc.templateContent = replace(loc.templateContent, "[description]", replace(arguments.migrationName,'"','&quot;','ALL'))>
 			
