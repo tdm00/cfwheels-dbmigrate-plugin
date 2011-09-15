@@ -28,3 +28,29 @@
   * Create rename-table template that includes parameters table and example code
   * Create create-table template that includes parameters table and example code
   * Fix problem with MySQL statements for inserting values into date/time fields
+
+* 0.6.0
+  * N/A
+  
+* 0.5.0
+  * N/A  
+  
+* 0.4.0
+  * Fixed issues with descriptions and filenaming when creating migrations from templates - Issue 1
+  * references() and timestamps() now use lowercase column names to fit with cfwheels recommended conventions - Issue 2
+  * Creating migration files from template fixed for case-sensitive platforms - Issue 3
+  * Support for longer migration names - Issue 5
+  * Timestamp bug fixed for 24 hour time - Issue 6
+  * Removed cftransaction wrapper - alternate version provided (more info)
+
+* 0.3 Migration Tracking
+  * Fixed migration version tracking so you can run all non-migrated versions
+  * SQL Server and Oracle adapter updates
+  * Access to Wheels model() function within migrations
+
+* 0.2 Migration Templates Update
+  * Added functionality to plugin page to create migrations from templates
+
+* 0.1 Initial Release
+  * Initial Release for feedback and suggestions
+  * Tested with MySQL and Coldfusion 8
