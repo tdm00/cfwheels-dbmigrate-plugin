@@ -96,6 +96,9 @@
 	 <option value="create-record">Create record</option>
 	 <option value="update-record">Update record</option>
 	 <option value="remove-record">Remove record</option>
+	 <option value="">-- Miscellaneous Operations --</option>
+	 <option value="announce">Announce operation</option>
+	 <option value="execute">Execute operation</option>
 	</select>
 	</p>
 	
