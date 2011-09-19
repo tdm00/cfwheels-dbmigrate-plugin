@@ -162,9 +162,10 @@
 		<cfargument name="migrationName" type="string" required="true" />
 		<cfargument name="templateName" type="string" required="true" />
 		<cfargument name="migrationPrefix" type="string" required="false" default="" />
-		<cfset var loc = {}>
-		<cfset loc.migrationsPath = expandPath("db/migrate")>
-		<cfset loc.templateFile = expandPath("plugins/dbmigrate/templates") & "/" & arguments.templateName & ".cfc">
+		<cfset var loc = {}/>
+		<cfset loc.migrationsPath = expandPath("db/migrate")/>
+		<cfset loc.templateFile = expandPath("plugins/dbmigrate/templates") & "/" & arguments.templateName & ".cfc"/>
+		<cfset loc.extendsPath = "plugins.dbmigrate.Migration"/>
 		<cfif not FileExists(loc.templateFile)>
 			<cfreturn "Template #arguments.templateName# could not be found">
 		</cfif>
@@ -174,9 +175,11 @@
 		<cftry>
 			<cffile action="read" file="#loc.templateFile#" variable="loc.templateContent">
 
-			<!--- TODO: need to determine if app sits in subfolder under webroot and needs different extends path --->
+			<cfif Len(Trim(application.wheels.rootcomponentpath)) GT 0>
+			  <cfset loc.extendsPath = application.wheels.rootcomponentpath & ".plugins.dbmigrate.Migration"/>
+			</cfif>
 			
-			<cfset loc.templateContent = replace(loc.templateContent, "[extends]", "plugins.dbmigrate.Migration")>
+			<cfset loc.templateContent = replace(loc.templateContent, "[extends]", loc.extendsPath)>
 			<cfset loc.templateContent = replace(loc.templateContent, "[description]", replace(arguments.migrationName,'"','&quot;','ALL'))>
 			
 			<cfset loc.migrationFile = REREplace(arguments.migrationName,"[^A-z0-9]+"," ","ALL")>
