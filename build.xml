@@ -11,7 +11,8 @@
 	Read in the developers specific properties from the developers property file
 	-->
 	<property file="build.properties"/>
-	
+	<property name="dir.build" value="build"/>
+	<property name="dir.src" value="src"/>
 
 	<!-- 
 	"HELP" TASK DEFINITION
@@ -43,12 +44,19 @@
 			<equals arg1="" arg2="${plugin.version}" casesensitive="false" trim="true"/>
 		</condition>
 		<fail if="do.abort">A version number is required, build aborted.</fail>		
-	  
-    <zip destfile="${cfwheels.plugindir}/dbmigrate-${plugin.version}.zip"
-      basedir="."
+	  <mkdir dir="${dir.build}"/>
+	  <mkdir dir="${dir.src}"/>
+    <copy todir="${dir.src}">
+      <fileset dir=".">
+        <exclude name="build*"/>
+      </fileset>
+    </copy>	
+    <replace file="${dir.src}/index.cfm" token="9.9.9" value="${plugin.version}"/>
+    <zip destfile="${dir.build}/dbmigrate-${plugin.version}.zip"
+      basedir="${dir.src}"
       excludes="build.xml,build.properties"
       update="false" />
-
+    <delete dir="${dir.src}"/>
 		<echo></echo>
 		<echo>Remember to reload the application</echo>
 		<echo></echo>
