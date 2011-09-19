@@ -25,7 +25,7 @@
 					<cfset loc.migration = loc.migrations[loc.i]>
 					<cfif loc.migration.version lte arguments.version><cfbreak></cfif>
 					<cfif loc.migration.status eq "migrated">
-					  <cftransaction action="begin">
+            <!--- <cftransaction action="begin"> --->
   						<cftry>
   							<cfset loc.feedback = loc.feedback & "#chr(13)#------- " & loc.migration.cfcfile & " #RepeatString("-",Max(5,50-Len(loc.migration.cfcfile)))##chr(13)#">
   							<cfset Request.migrationOutput = "">
@@ -36,12 +36,12 @@
   							<cfset $removeVersionAsMigrated(loc.migration.version)>
   							<cfcatch type="any">
   								<cfset loc.feedback = loc.feedback & "Error migrating to #loc.migration.version#.#chr(13)##CFCATCH.Message##chr(13)##CFCATCH.Detail##chr(13)#">
-  								<cftransaction action="rollback" />
+                  <!--- <cftransaction action="rollback" /> --->
   								<cfbreak>
   							</cfcatch>
   						</cftry>
-  						<cftransaction action="commit" />
-						</cftransaction>
+              <!--- <cftransaction action="commit" />
+            </cftransaction> --->
 					</cfif>
 				</cfloop>
 			<cfelse>
@@ -49,7 +49,7 @@
 				<cfloop index="loc.i" from="1" to="#ArrayLen(loc.migrations)#">
 					<cfset loc.migration = loc.migrations[loc.i]>
 					<cfif loc.migration.version lte arguments.version and loc.migration.status neq "migrated">
-					  <cftransaction action="begin">
+            <!--- <cftransaction action="begin"> --->
   						<cftry>
   							<cfset loc.feedback = loc.feedback & "#chr(13)#-------- " & loc.migration.cfcfile & " #RepeatString("-",Max(5,50-Len(loc.migration.cfcfile)))##chr(13)#">
   							<cfset Request.migrationOutput = "">
@@ -60,12 +60,12 @@
   							<cfset $setVersionAsMigrated(loc.migration.version)>
   							<cfcatch type="any">
   								<cfset loc.feedback = loc.feedback & "Error migrating to #loc.migration.version#.#chr(13)##CFCATCH.Message##chr(13)##CFCATCH.Detail##chr(13)#">
-  								<cftransaction action="rollback" />
+                  <!--- <cftransaction action="rollback" /> --->
                   <cfbreak>
   							</cfcatch>
   						</cftry>
-							<cftransaction action="commit" />
-						</cftransaction>
+              <!--- <cftransaction action="commit" />
+            </cftransaction> --->
 					<cfelseif loc.migration.version gt arguments.version>
 						<cfbreak>			
 					</cfif>

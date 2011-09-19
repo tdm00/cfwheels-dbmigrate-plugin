@@ -11,6 +11,11 @@
 	<cfparam name="Form.migrationPrefix" default="">
 	<cfset flashInsert(dbmigrateFeedback2=application.wheels.plugins.dbmigrate.createMigration(Form.migrationName,Form.templateName,Form.migrationPrefix))>
 	<cfset redirectTo(back=true)>
+<cfelseif isDefined("url.migrateToVersion") And Len(Trim(url.migrateToVersion)) GT 0 And IsNumeric(url.migrateToVersion)>
+  <cfif isDefined("url.password") And Trim(url.password) EQ application.wheels.reloadPassword>
+  	<cfset flashInsert(dbmigrateFeedback=application.wheels.plugins.dbmigrate.migrateTo(url.migrateToVersion))>
+  	<cfset redirectTo(back=true)>
+  </cfif>
 </cfif>
 
 <!--- Get current database version --->
