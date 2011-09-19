@@ -5,6 +5,9 @@
     * Add Oracle code specific block to basefunctions.cfm
     * Add transaction wrapping in dbmigrate.cfc
     * Add foreign key column removal when dropping a table in migration.cfc
+  * Add ability to trigger migrations by calling plugin from URL with migrateToVersion URL parameter
+  * DBMigrate automatically determines correct path for Extends in migration files
+  * Add plugin version number to plugin page
   
 * 0.7.2
   * Update README.md with renamed project URL's
