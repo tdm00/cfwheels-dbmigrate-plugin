@@ -1,14 +1,14 @@
 # Changelog
 
 * 0.8.0
-  * Incorporated code changes from Raul Riera, specifically:
+  * Incorporated [code changes from Raúl Riera](https://github.com/talltroym/cfwheels-dbmigrate-plugin/issues/27), specifically:
     * Add Oracle code specific block to basefunctions.cfm
     * Add transaction wrapping in dbmigrate.cfc
     * Add foreign key column removal when dropping a table in migration.cfc
-  * Add ability to trigger migrations by calling plugin from URL with migrateToVersion URL parameter
-  * DBMigrate automatically determines correct path for Extends in migration files
-  * Add plugin version number to plugin page
-  * Resolve issue #6 when using renameColumn() with MySQL (https://github.com/talltroym/cfwheels-dbmigrate-plugin/issues/6)
+  * Add ability to [trigger migrations by calling plugin from URL](https://github.com/talltroym/cfwheels-dbmigrate-plugin/issues/28) with migrateToVersion URL parameter
+  * DBMigrate automatically [determines correct path for Extends](https://github.com/talltroym/cfwheels-dbmigrate-plugin/issues/33) in migration files
+  * Add [plugin version number](https://github.com/talltroym/cfwheels-dbmigrate-plugin/issues/31) to plugin page
+  * Resolve [issue #6](https://github.com/talltroym/cfwheels-dbmigrate-plugin/issues/6) when using renameColumn() with MySQL
   
 * 0.7.2
   * Update README.md with renamed project URL's
