@@ -78,6 +78,7 @@
 	<cfargument name="columnName" type="string" required="yes" hint="column name">
 	<cfset var loc = {}>
 	<cfdbinfo name="loc.columns" type="columns" table="#arguments.tableName#" datasource="#application.wheels.dataSourceName#" username="#application.wheels.dataSourceUserName#" password="#application.wheels.dataSourcePassword#">
+    <!--- <cfdump var="#loc#" abort> --->
 	<cfscript>
 	loc.columnDefinition = "";
 	loc.iEnd = loc.columns.RecordCount;
@@ -95,7 +96,9 @@
 			} else {
 				loc.columnDefinition = loc.columnDefinition & " NOT NULL";
 			}
-			if(ListFindNoCase("char,varchar,binary,varbinary",loc.columnType)) {
+			if(Len(loc.columns["COLUMN_DEFAULT_VALUE"][loc.i]) == 0) {
+				loc.columnDefinition = loc.columnDefinition & " DEFAULT NULL";
+			} else if(ListFindNoCase("char,varchar,binary,varbinary",loc.columnType)) {
 				loc.columnDefinition = loc.columnDefinition & " DEFAULT '#loc.columns["COLUMN_DEFAULT_VALUE"][loc.i]#'";
 			} else if(ListFindNoCase("int,bigint,smallint,tinyint,decimal,float,double",loc.columnType)) {
 				loc.columnDefinition = loc.columnDefinition & " DEFAULT #loc.columns["COLUMN_DEFAULT_VALUE"][loc.i]#";

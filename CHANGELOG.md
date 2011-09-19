@@ -8,6 +8,7 @@
   * Add ability to trigger migrations by calling plugin from URL with migrateToVersion URL parameter
   * DBMigrate automatically determines correct path for Extends in migration files
   * Add plugin version number to plugin page
+  * Resolve issue #6 when using renameColumn() with MySQL (https://github.com/talltroym/cfwheels-dbmigrate-plugin/issues/6)
   
 * 0.7.2
   * Update README.md with renamed project URL's
