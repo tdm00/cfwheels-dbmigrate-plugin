@@ -1,5 +1,8 @@
 <cfsetting enablecfoutputonly="true">
 
+<cfset dbmigrateMeta = {}>
+<cfset dbmigrateMeta.version = "0.8.0">
+
 <cfif isDefined("Form.version")>
 	<cfset flashInsert(dbmigrateFeedback=application.wheels.plugins.dbmigrate.migrateTo(Form.version))>
 	<cfset redirectTo(back=true)>
@@ -25,7 +28,7 @@
 
 <cfinclude template="css.cfm">
 
-<h1>DBMigrate</h1>
+<h1>DBMigrate v#dbmigrateMeta.version#</h1>
 <h2>inspired by Active Record migrations</h2>
 <p>Database Migrations are an easy way to build and alter your database structure using cfscript.</p>
 
