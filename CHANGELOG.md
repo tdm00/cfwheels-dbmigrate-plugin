@@ -1,10 +1,9 @@
 # Changelog
 
 * 0.8.0
-  * Incorporated [code changes from Raúl Riera](https://github.com/talltroym/cfwheels-dbmigrate-plugin/issues/27), specifically:
-    * Add Oracle code specific block to basefunctions.cfm
-    * Add transaction wrapping in dbmigrate.cfc
-    * Add foreign key column removal when dropping a table in migration.cfc
+  * Add Oracle code specific block to basefunctions.cfm - [code changes from Raúl Riera](https://github.com/talltroym/cfwheels-dbmigrate-plugin/issues/27)
+  * Add transaction wrapping in dbmigrate.cfc - [code changes from Raúl Riera](https://github.com/talltroym/cfwheels-dbmigrate-plugin/issues/27)
+  * Add foreign key column removal when dropping a table in migration.cfc - [code changes from Raúl Riera](https://github.com/talltroym/cfwheels-dbmigrate-plugin/issues/27)
   * Add ability to [trigger migrations by calling plugin from URL](https://github.com/talltroym/cfwheels-dbmigrate-plugin/issues/28) with migrateToVersion URL parameter
   * DBMigrate automatically [determines correct path for Extends](https://github.com/talltroym/cfwheels-dbmigrate-plugin/issues/33) in migration files
   * Add [plugin version number](https://github.com/talltroym/cfwheels-dbmigrate-plugin/issues/31) to plugin page
