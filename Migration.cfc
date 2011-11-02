@@ -175,27 +175,27 @@
 	<cffunction name="addRecord" returntype="void" access="public" hint="adds a record to a table">
 		<cfargument name="table" type="string" required="true" hint="table name">
 		<cfscript>
-		var loc = {};
-		loc.columnNames = "";
-		loc.columnValues = "";
-		for (loc.key in arguments) {
-			if(loc.key neq "table") {
-				loc.columnNames = ListAppend(loc.columnNames,this.adapter.quoteColumnName(loc.key));
-				if(IsNumeric(arguments[loc.key])) {
-					loc.columnValues = ListAppend(loc.columnValues,arguments[loc.key]);
-				} else if(IsBoolean(arguments[loc.key])) {
-					loc.columnValues = ListAppend(loc.columnValues,IIf(arguments[loc.key],1,0));
-				} else if(IsDate(arguments[loc.key])) {
-					loc.columnValues = ListAppend(loc.columnValues,"#arguments[loc.key]#");
-				} else {
-					loc.columnValues = ListAppend(loc.columnValues,"'#arguments[loc.key]#'");
+			var loc = {};
+			loc.columnNames = "";
+			loc.columnValues = "";
+			for (loc.key in arguments) {
+				if(loc.key neq "table") {
+					loc.columnNames = ListAppend(loc.columnNames,this.adapter.quoteColumnName(loc.key));
+					if(IsNumeric(arguments[loc.key])) {
+						loc.columnValues = ListAppend(loc.columnValues,arguments[loc.key]);
+					} else if(IsBoolean(arguments[loc.key])) {
+						loc.columnValues = ListAppend(loc.columnValues,IIf(arguments[loc.key],1,0));
+					} else if(IsDate(arguments[loc.key])) {
+						loc.columnValues = ListAppend(loc.columnValues,"#arguments[loc.key]#");
+					} else {
+						loc.columnValues = ListAppend(loc.columnValues,"'#ReplaceNoCase(#arguments[loc.key]#,"'","''")#'");
+					}
 				}
 			}
-		}
-		if(loc.columnNames != '') {
-			$execute("INSERT INTO #this.adapter.quoteTableName(LCase(arguments.table))# ( #loc.columnNames# ) VALUES ( #loc.columnValues# )");
-			announce("Added record to table #arguments.table#");
-		}
+			if(loc.columnNames != '') {
+				$execute("INSERT INTO #this.adapter.quoteTableName(LCase(arguments.table))# ( #loc.columnNames# ) VALUES ( #loc.columnValues# )");
+				announce("Added record to table #arguments.table#");
+			}
 		</cfscript>
 	</cffunction>
 
