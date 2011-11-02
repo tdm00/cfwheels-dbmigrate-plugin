@@ -1,5 +1,9 @@
 # Changelog
 
+* 0.8.1
+  * When generating SQL INSERT code with values that use an apostrophe or single quote, these values are escaped properly - [https://github.com/talltroym/cfwheels-dbmigrate-plugin/issues/36](https://github.com/talltroym/cfwheels-dbmigrate-plugin/issues/36)
+  * Update compatibility for ColdFusion on Wheels framework 1.1.6 - [https://github.com/talltroym/cfwheels-dbmigrate-plugin/issues/38](https://github.com/talltroym/cfwheels-dbmigrate-plugin/issues/38)
+
 * 0.8.0
   * Add Oracle code specific block to basefunctions.cfm - [code changes from Raúl Riera](https://github.com/talltroym/cfwheels-dbmigrate-plugin/issues/27)
   * Add transaction wrapping in dbmigrate.cfc - [code changes from Raúl Riera](https://github.com/talltroym/cfwheels-dbmigrate-plugin/issues/27)
