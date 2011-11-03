@@ -1,16 +1,20 @@
 # Changelog
 
+
+* 0.8.2
+  * Fixed: updateRecord incorrectly adds single quotes to date values - [https://github.com/talltroym/cfwheels-dbmigrate-plugin/issues/39](https://github.com/talltroym/cfwheels-dbmigrate-plugin/issues/39)
+
 * 0.8.1
-  * When generating SQL INSERT code with values that use an apostrophe or single quote, these values are escaped properly - [https://github.com/talltroym/cfwheels-dbmigrate-plugin/issues/36](https://github.com/talltroym/cfwheels-dbmigrate-plugin/issues/36)
+  * Fixed: When generating SQL INSERT code with values that use an apostrophe or single quote, these values are escaped properly - [https://github.com/talltroym/cfwheels-dbmigrate-plugin/issues/36](https://github.com/talltroym/cfwheels-dbmigrate-plugin/issues/36)
   * Update compatibility for ColdFusion on Wheels framework 1.1.6 - [https://github.com/talltroym/cfwheels-dbmigrate-plugin/issues/38](https://github.com/talltroym/cfwheels-dbmigrate-plugin/issues/38)
 
 * 0.8.0
-  * Add Oracle code specific block to basefunctions.cfm - [code changes from Raúl Riera](https://github.com/talltroym/cfwheels-dbmigrate-plugin/issues/27)
-  * Add transaction wrapping in dbmigrate.cfc - [code changes from Raúl Riera](https://github.com/talltroym/cfwheels-dbmigrate-plugin/issues/27)
-  * Add foreign key column removal when dropping a table in migration.cfc - [code changes from Raúl Riera](https://github.com/talltroym/cfwheels-dbmigrate-plugin/issues/27)
-  * Add ability to [trigger migrations by calling plugin from URL](https://github.com/talltroym/cfwheels-dbmigrate-plugin/issues/28) with migrateToVersion URL parameter
-  * DBMigrate automatically [determines correct path for Extends](https://github.com/talltroym/cfwheels-dbmigrate-plugin/issues/33) in migration files
-  * Add [plugin version number](https://github.com/talltroym/cfwheels-dbmigrate-plugin/issues/31) to plugin page
+  * New: Add Oracle code specific block to basefunctions.cfm - [code changes from Raúl Riera](https://github.com/talltroym/cfwheels-dbmigrate-plugin/issues/27)
+  * New: Add transaction wrapping in dbmigrate.cfc - [code changes from Raúl Riera](https://github.com/talltroym/cfwheels-dbmigrate-plugin/issues/27)
+  * New: Add foreign key column removal when dropping a table in migration.cfc - [code changes from Raúl Riera](https://github.com/talltroym/cfwheels-dbmigrate-plugin/issues/27)
+  * New: Add ability to [trigger migrations by calling plugin from URL](https://github.com/talltroym/cfwheels-dbmigrate-plugin/issues/28) with migrateToVersion URL parameter
+  * Fixed: DBMigrate automatically [determines correct path for Extends](https://github.com/talltroym/cfwheels-dbmigrate-plugin/issues/33) in migration files
+  * New: Add [plugin version number](https://github.com/talltroym/cfwheels-dbmigrate-plugin/issues/31) to plugin page
   * Resolve [issue #6](https://github.com/talltroym/cfwheels-dbmigrate-plugin/issues/6) when using renameColumn() with MySQL
   
 * 0.7.2
@@ -18,7 +22,7 @@
   * Create CHANGELOG.md file
 
 * 0.7.1
-  * Renamed references to DBMigrate to be dbmigrate to resolve a problem with case-sensitive file-systems, such as *nix
+  * Fixed: Renamed references to DBMigrate to be dbmigrate to resolve a problem with case-sensitive file-systems, such as *nix
 
 * 0.7.0
   * Update plugin compatibility for CFWheels 1.1.3, 1.1.4 and 1.1.5
