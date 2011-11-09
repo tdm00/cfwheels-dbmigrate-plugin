@@ -188,7 +188,7 @@
 					} else if(IsDate(arguments[loc.key])) {
 						loc.columnValues = ListAppend(loc.columnValues,"#arguments[loc.key]#");
 					} else {
-						loc.columnValues = ListAppend(loc.columnValues,"'#ReplaceNoCase(#arguments[loc.key]#,"'","''")#'");
+						loc.columnValues = ListAppend(loc.columnValues,"'#ReplaceNoCase(arguments[loc.key],"'","''")#'");
 					}
 				}
 			}
