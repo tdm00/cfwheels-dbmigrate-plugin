@@ -49,6 +49,9 @@
     <copy todir="${dir.src}">
       <fileset dir=".">
         <exclude name="build*"/>
+        <exclude name="src*"/>
+        <exclude name="/build"/>
+        <exclude name="/src*"/>
       </fileset>
     </copy>	
     <replace file="${dir.src}/index.cfm" token="9.9.9" value="${plugin.version}"/>
