@@ -40,6 +40,7 @@ Just want to acknowledge, and thanks, everyone that's helped with this plugin.  
 * Chris Peters
 * Raúl Reira
 * Tom Hoen
+* Adam Michel
 * Everyone who has submitted bugs on the issue tracker
 
 ## License
