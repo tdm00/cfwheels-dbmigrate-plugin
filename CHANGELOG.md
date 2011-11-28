@@ -1,6 +1,10 @@
 # Changelog
 
 
+* 0.9.0
+  * Fixed: Simple syntax error in Migration.cfc was causing the createObjectFromRoot to throw an exception. Fixed syntax error and migrations work again.  - [https://github.com/talltroym/cfwheels-dbmigrate-plugin/issues/41](https://github.com/talltroym/cfwheels-dbmigrate-plugin/issues/41)
+  * Fixed: String values with more then one single quote aren't being escaped in generated SQL  - [https://github.com/talltroym/cfwheels-dbmigrate-plugin/issues/42](https://github.com/talltroym/cfwheels-dbmigrate-plugin/issues/42)
+
 * 0.8.2
   * Fixed: updateRecord incorrectly adds single quotes to date values - [https://github.com/talltroym/cfwheels-dbmigrate-plugin/issues/39](https://github.com/talltroym/cfwheels-dbmigrate-plugin/issues/39)
 
