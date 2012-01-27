@@ -4,11 +4,16 @@
 		<cfargument name="adapter" type="any" required="yes" hint="database adapter">
 		<cfargument name="name" type="string" required="yes" hint="table name in pluralized form">
 		<cfargument name="force" type="boolean" required="no" default="true" hint="whether or not to drop table of same name before creating new one">
-		<cfargument name="id" type="boolean" required="no" default="false" hint="if false, defines a table with no primary key">
+		<cfargument name="id" type="boolean" required="no" default="true" hint="if false, defines a table with no primary key">
 		<cfargument name="primaryKey" type="string" required="no" default="id" hint="overrides default primary key">
 		<cfscript>
 		var loc = {};
 		loc.args = "adapter,name,force";
+		
+		this.primaryKeys = ArrayNew(1);
+		this.foreignKeys = ArrayNew(1);
+		this.columns = ArrayNew(1);
+		
 		loc.iEnd = ListLen(loc.args);
 		for (loc.i=1; loc.i <= loc.iEnd; loc.i++) {
 			loc.argumentName = ListGetAt(loc.args,loc.i);
@@ -16,14 +21,42 @@
 				this[loc.argumentName] = arguments[loc.argumentName];
 			}
 		}
-		this.columns = ArrayNew(1);
+		
 		if(arguments.id && Len(arguments.primaryKey)) {
-			column(columnName=arguments.primaryKey,columnType="primaryKey");
+			this.primaryKey(name=arguments.primaryKey, autoIncrement=true);
 		}
-		this.foreignKeys = ArrayNew(1);
 		</cfscript>
 		<cfreturn this>
 	</cffunction>
+    
+    <cffunction name="primaryKey" returntype="void" access="public" hint="adds a primary key definition to the table. this method also allows for multiple primary keys.">
+    	<cfargument name="name" type="string" required="yes" hint="primary key column name">
+        <cfargument name="type" type="string" required="false" default="integer" hint="type for the primary key column">
+        <cfargument name="autoIncrement" type="boolean" required="no" default="false">
+		<cfargument name="limit" type="numeric" required="no" hint="character or integer size">
+		<cfargument name="precision" type="numeric" required="no" hint="number of digits the column can hold">
+		<cfargument name="scale" type="numeric" required="no" hint="number of digits that can be placed to the right of the decimal point (must be less than or equal to precision)">
+        <cfargument name="references" type="string" required="no" hint="table this primary key should reference as a foreign key">
+        <cfscript>
+        var loc = {};
+		arguments.null = false;
+		arguments.adapter = this.adapter;
+		
+		// don't allow multiple autoIncrement primarykeys
+		if (ArrayLen(this.primaryKeys) && arguments.autoIncrement)
+			$throw(message="You cannot have multiple auto increment primary keys.");
+		
+		loc.column = CreateObject("component", "ColumnDefinition").init(argumentCollection=arguments);
+		ArrayAppend(this.primaryKeys, loc.column);
+			
+		if(StructKeyExists(arguments, "references"))
+		{
+			loc.referenceTable = pluralize(arguments.references);
+			loc.foreignKey = CreateObject("component","ForeignKeyDefinition").init(adapter=this.adapter,table=this.name,referenceTable=loc.referenceTable,column=arguments.name,referenceColumn="id");
+			ArrayAppend(this.foreignKeys,loc.foreignKey);
+		}
+        </cfscript>
+    </cffunction>
 	
 	<cffunction name="column" returntype="void" access="public" hint="adds a column to table definition">
 		<cfargument name="columnName" type="string" required="yes" hint="column name">
@@ -260,7 +293,7 @@
 			$execute(this.adapter.dropTable(this.name));
 			announce("Dropped table #LCase(this.name)#");
 		}
-		$execute(this.adapter.createTable(name=this.name,columns=this.columns,foreignKeys=this.foreignKeys));
+		$execute(this.adapter.createTable(name=this.name, primaryKeys=this.primaryKeys, columns=this.columns, foreignKeys=this.foreignKeys));
 		announce("Created table #LCase(this.name)#");
 		loc.iEnd = ArrayLen(this.foreignKeys);
 		for (loc.i=1; loc.i <= loc.iEnd; loc.i++) {
