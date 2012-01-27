@@ -65,7 +65,6 @@
 
 	<cffunction name="addColumnOptions" returntype="string" access="public">
 		<cfargument name="sql" type="string" required="true" hint="column definition sql">
-		<cfargument name="type" type="string" required="false" hint="column type">
 		<cfargument name="options" type="struct" required="false" default="#StructNew()#" hint="column options">
 		<cfscript>
 		if(StructKeyExists(arguments.options,'type') && arguments.options.type != 'primaryKey') {
