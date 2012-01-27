@@ -229,10 +229,22 @@
 		loc.iEnd = ListLen(arguments.referenceNames);
 		for (loc.i=1; loc.i <= loc.iEnd; loc.i++) {
 			loc.referenceName = ListGetAt(arguments.referenceNames,loc.i);
-			column(columnName = loc.referenceName & "id",columnType="integer",default=arguments.default,null=arguments.null);
-			if(arguments.polymorphic) {
+			
+			// get all possible arguments for the column
+			loc.columnArgs = {};
+			for (loc.arg in ListToArray("columnType,default,null,limit,precision,scale"))
+				if (StructKeyExists(arguments, loc.arg))
+					loc.columnArgs[loc.arg] = arguments[loc.arg];
+			
+			// default the column to an integer if not provided
+			if (!StructKeyExists(loc.columnArgs, "columnType"))
+				loc.columnArgs.columnType = "integer";
+			
+			column(columnName = loc.referenceName & "id", argumentCollection=loc.columnArgs);
+			
+			if(arguments.polymorphic)
 				column(columnName=loc.referenceName & "type",columnType="string");
-			}
+			
 			if(arguments.foreignKey && !arguments.polymorphic) {
 				loc.referenceTable = pluralize(loc.referenceName);
 				loc.foreignKey = CreateObject("component","ForeignKeyDefinition").init(adapter=this.adapter,table=this.name,referenceTable=loc.referenceTable,column="#loc.referenceName#id",referenceColumn="id");

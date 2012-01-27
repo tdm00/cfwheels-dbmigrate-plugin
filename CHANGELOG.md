@@ -2,6 +2,7 @@
 
 
 * 0.9.0
+  * Fixed: Allow the references method in TableDefinition.cfc to take in all possible column arguments.
   * Fixed: Simple syntax error in Migration.cfc was causing the createObjectFromRoot to throw an exception. Fixed syntax error and migrations work again.  - [https://github.com/talltroym/cfwheels-dbmigrate-plugin/issues/41](https://github.com/talltroym/cfwheels-dbmigrate-plugin/issues/41)
   * Fixed: String values with more then one single quote aren't being escaped in generated SQL  - [https://github.com/talltroym/cfwheels-dbmigrate-plugin/issues/42](https://github.com/talltroym/cfwheels-dbmigrate-plugin/issues/42)
 
