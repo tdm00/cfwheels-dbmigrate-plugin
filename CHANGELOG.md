@@ -2,6 +2,7 @@
 
 
 * 0.9.0
+  * Enhancement: Updated the TableDefinitions.cfc methods to allow chaining to have a bit cleaner code in the migrations.
   * Fixed: Removed an argument for addColumnOptions in adapters/Abstract.cfc that was no longer needed.
   * Enhancement: Expose more functionality around primary keys to be able to model real world databases. This includes being able to specify primary keys that also have foreign key references and creating a table with multiple primary keys.
   * Enhancement: Allow the references method in TableDefinition.cfc to take in all possible column arguments.
