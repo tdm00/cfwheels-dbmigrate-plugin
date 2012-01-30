@@ -37,7 +37,6 @@
 		<cfargument name="precision" type="numeric" required="no" hint="number of digits the column can hold">
 		<cfargument name="scale" type="numeric" required="no" hint="number of digits that can be placed to the right of the decimal point (must be less than or equal to precision)">
         <cfargument name="references" type="string" required="no" hint="table this primary key should reference as a foreign key">
-        <cfargument name="pluralize" type="boolean" required="no" default="true">
         <cfscript>
         var loc = {};
 		arguments.null = false;
@@ -52,8 +51,7 @@
 			
 		if(StructKeyExists(arguments, "references"))
 		{
-			if (arguments.pluralize)
-				loc.referenceTable = pluralize(arguments.references);
+			loc.referenceTable = pluralize(arguments.references);
 			loc.foreignKey = CreateObject("component","ForeignKeyDefinition").init(adapter=this.adapter,table=this.name,referenceTable=loc.referenceTable,column=arguments.name,referenceColumn="id");
 			ArrayAppend(this.foreignKeys,loc.foreignKey);
 		}
