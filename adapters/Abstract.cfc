@@ -39,9 +39,32 @@
 		<cfreturn sql>
 	</cffunction>
 
+	<cffunction name="addPrimaryKeyOptions" returntype="string" access="public">
+		<cfthrow message="The `addPrimaryKeyOptions` must be implented in the storage specific adapter." />
+	</cffunction>
+    
+    <cffunction name="primaryKeyConstraint" returntype="string" access="public">
+    	<cfargument name="name" type="string" required="true">
+        <cfargument name="primaryKeys" type="array" required="true">
+        <cfscript>
+        var loc = {};
+		
+		loc.sql = "PRIMARY KEY (";
+		
+		for (loc.i = 1; loc.i lte ArrayLen(arguments.primaryKeys); loc.i++)
+		{
+			if (loc.i != 1) 
+				loc.sql = loc.sql & ", "; 
+			loc.sql = loc.sql & arguments.primaryKeys[loc.i].toColumnNameSQL();
+		}
+		
+		loc.sql = loc.sql & ")"; 
+        </cfscript>
+        <cfreturn loc.sql />
+    </cffunction>
+
 	<cffunction name="addColumnOptions" returntype="string" access="public">
 		<cfargument name="sql" type="string" required="true" hint="column definition sql">
-		<cfargument name="type" type="string" required="false" hint="column type">
 		<cfargument name="options" type="struct" required="false" default="#StructNew()#" hint="column options">
 		<cfscript>
 		if(StructKeyExists(arguments.options,'type') && arguments.options.type != 'primaryKey') {
@@ -96,15 +119,41 @@
 	<cffunction name="createTable" returntype="string" access="public" hint="generates sql to create a table">
 		<cfargument name="name" type="string" required="true" hint="table name">
 		<cfargument name="columns" type="array" required="true" hint="array of column definitions">
+		<cfargument name="primaryKeys" type="array" required="false" default="#ArrayNew(1)#" hint="array of primary key definitions">
 		<cfargument name="foreignKeys" type="array" required="false" default="#ArrayNew(1)#" hint="array of foreign key definitions">
 		<cfscript>
 		var loc = {};
 		loc.sql = "CREATE TABLE #quoteTableName(LCase(arguments.name))# (#chr(13)##chr(10)#";
+		
+		loc.iEnd = ArrayLen(arguments.primaryKeys);
+		
+		if (loc.iEnd == 1)
+		{
+			// if we have a single primary key, define the column with the primaryKey adapter method
+			loc.sql = loc.sql & " " & arguments.primaryKeys[1].toPrimaryKeySQL() & ",#chr(13)##chr(10)#";
+		}
+		else if (loc.iEnd > 1)
+		{
+			// add the primary key columns like we would normal columns
+			for (loc.i = 1; loc.i <= loc.iEnd; loc.i++) {
+				loc.sql = loc.sql & " " & arguments.primaryKeys[loc.i].toSQL();
+				if (loc.i != loc.iEnd || ArrayLen(arguments.columns))
+					loc.sql = loc.sql & ",#chr(13)##chr(10)#";
+			}
+		}
+		
+		// define the columns in the sql
 		loc.iEnd = ArrayLen(arguments.columns);
 		for (loc.i=1; loc.i <= loc.iEnd; loc.i++) {
 			loc.sql = loc.sql & " " & arguments.columns[loc.i].toSQL();
 			if(loc.i != loc.iEnd) { loc.sql = loc.sql & ",#chr(13)##chr(10)#"; }
 		}
+		
+		// if we have multiple primarykeys the adapater might need to add a constraint here
+		if (ArrayLen(arguments.primaryKeys) > 1)
+			loc.sql = loc.sql & ",#chr(13)##chr(10)# " & primaryKeyConstraint(argumentCollection=arguments);
+		
+		// define the foreign keys
 		loc.iEnd = ArrayLen(arguments.foreignKeys);
 		for (loc.i=1; loc.i <= loc.iEnd; loc.i++) {
 			loc.sql = loc.sql & ",#chr(13)##chr(10)# " & arguments.foreignKeys[loc.i].toSQL();

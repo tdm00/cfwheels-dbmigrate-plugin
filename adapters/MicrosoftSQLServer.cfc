@@ -1,7 +1,6 @@
 <cfcomponent extends="Abstract">
 
 	<cfset variables.sqlTypes = {}>
-	<cfset variables.sqlTypes['primaryKey'] = "INT NOT NULL IDENTITY(1,1) PRIMARY KEY">
 	<cfset variables.sqlTypes['binary'] = {name='IMAGE'}>
 	<cfset variables.sqlTypes['boolean'] = {name='BIT'}>
 	<cfset variables.sqlTypes['date'] = {name='DATETIME'}>
@@ -17,6 +16,43 @@
 	<cffunction name="adapterName" returntype="string" access="public" hint="name of database adapter">
 		<cfreturn "MicrosoftSQLServer">
 	</cffunction>
+
+	<cffunction name="addPrimaryKeyOptions" returntype="string" access="public">
+		<cfargument name="sql" type="string" required="true" hint="column definition sql">
+		<cfargument name="options" type="struct" required="false" default="#StructNew()#" hint="column options">
+		<cfscript>
+		if (StructKeyExists(arguments.options, "null") && arguments.options.null)
+			arguments.sql = arguments.sql & " NULL";
+		else
+			arguments.sql = arguments.sql & " NOT NULL";
+		
+		if (StructKeyExists(arguments.options, "autoIncrement") && arguments.options.autoIncrement)
+			arguments.sql = arguments.sql & " IDENTITY(1,1)";
+		
+		arguments.sql = arguments.sql & " PRIMARY KEY";
+		</cfscript>
+		<cfreturn arguments.sql>
+	</cffunction>
+    
+    <cffunction name="primaryKeyConstraint" returntype="string" access="public">
+    	<cfargument name="name" type="string" required="true">
+        <cfargument name="primaryKeys" type="array" required="true">
+        <cfscript>
+        var loc = {};
+		
+		loc.sql = "CONSTRAINT [PK_#arguments.name#] PRIMARY KEY CLUSTERED (";
+		
+		for (loc.i = 1; loc.i lte ArrayLen(arguments.primaryKeys); loc.i++)
+		{
+			if (loc.i != 1) 
+				loc.sql = loc.sql & ", "; 
+			loc.sql = loc.sql & arguments.primaryKeys[loc.i].toColumnNameSQL() & " ASC";
+		}
+		
+		loc.sql = loc.sql & ")"; 
+        </cfscript>
+        <cfreturn loc.sql />
+    </cffunction>
 
 	<!---  SQL Server uses square brackets to escape table and column names --->
 	<cffunction name="quoteTableName" returntype="string" access="public" hint="surrounds table or index names with quotes">
