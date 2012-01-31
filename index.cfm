@@ -1,7 +1,7 @@
 <cfsetting enablecfoutputonly="true">
 
 <cfset dbmigrateMeta = {}>
-<cfset dbmigrateMeta.version = "0.9">
+<cfset dbmigrateMeta.version = "1.0.0">
 
 <cfif isDefined("Form.version")>
 	<cfset flashInsert(dbmigrateFeedback=application.wheels.plugins.dbmigrate.migrateTo(Form.version))>
@@ -50,7 +50,7 @@
 
 <cfif ArrayLen(migrations) gt 0>
 	<h2>Migrate</h2>
-	<form action="#CGI.script_name & '?' & CGI.query_string#" method="post">
+	<form action="#CGI.script_name & '?' & CGI.query_string# & '&requesttimeout=99999'" method="post">
 	<p>Migrate to version
 	<select name="version">
 	<cfif lastVersion neq 0><option value="#lastVersion#" selected="selected">All non-migrated</option></cfif>

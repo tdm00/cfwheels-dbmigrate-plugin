@@ -1,5 +1,8 @@
 # Changelog
 
+* 1.0.0
+  * Misc: Change plugin version numbering to match Semantic Versioning (http://semver.org/)
+  * New: Added request timeout variable value of 999999 when submitting migrations to help prevent timeouts
 
 * 0.9.0
   * Fixed: Simple syntax error in Migration.cfc was causing the createObjectFromRoot to throw an exception. Fixed syntax error and migrations work again.  - [https://github.com/talltroym/cfwheels-dbmigrate-plugin/issues/41](https://github.com/talltroym/cfwheels-dbmigrate-plugin/issues/41)
