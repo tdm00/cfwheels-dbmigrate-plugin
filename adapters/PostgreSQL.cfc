@@ -1,7 +1,6 @@
 <cfcomponent extends="Abstract">
 
 	<cfset variables.sqlTypes = {}>
-	<cfset variables.sqlTypes['primaryKey'] = "SERIAL PRIMARY KEY">
 	<cfset variables.sqlTypes['binary'] = {name='BYTEA'}>
 	<cfset variables.sqlTypes['boolean'] = {name='BOOLEAN'}>
 	<cfset variables.sqlTypes['date'] = {name='DATE'}>
@@ -16,6 +15,18 @@
 
 	<cffunction name="adapterName" returntype="string" access="public" hint="name of database adapter">
 		<cfreturn "PostgreSQL">
+	</cffunction>
+
+	<cffunction name="addPrimaryKeyOptions" returntype="string" access="public">
+		<cfargument name="sql" type="string" required="true" hint="column definition sql">
+		<cfargument name="options" type="struct" required="false" default="#StructNew()#" hint="column options">
+		<cfscript>
+		if (StructKeyExists(arguments.options, "autoIncrement") && arguments.options.autoIncrement)
+			arguments.sql = ReplaceNoCase(arguments.sql, "INTEGER", "SERIAL", "all");
+		
+		arguments.sql = arguments.sql & " PRIMARY KEY";
+		</cfscript>
+		<cfreturn arguments.sql>
 	</cffunction>
 
 	<!--- postgres uses double quotes --->

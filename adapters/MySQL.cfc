@@ -1,7 +1,6 @@
 <cfcomponent extends="Abstract">
 
 	<cfset variables.sqlTypes = {}>
-	<cfset variables.sqlTypes['primaryKey'] = "INT(11) NOT NULL AUTO_INCREMENT PRIMARY KEY">
 	<cfset variables.sqlTypes['binary'] = {name='BLOB'}>
 	<cfset variables.sqlTypes['boolean'] = {name='TINYINT',limit=1}>
 	<cfset variables.sqlTypes['date'] = {name='DATE'}>
@@ -16,6 +15,23 @@
 
 	<cffunction name="adapterName" returntype="string" access="public" hint="name of database adapter">
 		<cfreturn "MySQL">
+	</cffunction>
+
+	<cffunction name="addPrimaryKeyOptions" returntype="string" access="public">
+		<cfargument name="sql" type="string" required="true" hint="column definition sql">
+		<cfargument name="options" type="struct" required="false" default="#StructNew()#" hint="column options">
+		<cfscript>
+		if (StructKeyExists(arguments.options, "null") && arguments.options.null)
+			arguments.sql = arguments.sql & " NULL";
+		else
+			arguments.sql = arguments.sql & " NOT NULL";
+		
+		if (StructKeyExists(arguments.options, "autoIncrement") && arguments.options.autoIncrement)
+			arguments.sql = arguments.sql & " AUTO_INCREMENT";
+		
+		arguments.sql = arguments.sql & " PRIMARY KEY";
+		</cfscript>
+		<cfreturn arguments.sql>
 	</cffunction>
 
 	<!---  MySQL uses angle quotes to escape table and column names --->

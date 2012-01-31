@@ -1,14 +1,19 @@
 <cfcomponent extends="Base">
 	
-	<cffunction name="init" returntype="TableDefinition" access="public">
+	<cffunction name="init" returntype="any" access="public">
 		<cfargument name="adapter" type="any" required="yes" hint="database adapter">
 		<cfargument name="name" type="string" required="yes" hint="table name in pluralized form">
 		<cfargument name="force" type="boolean" required="no" default="true" hint="whether or not to drop table of same name before creating new one">
-		<cfargument name="id" type="boolean" required="no" default="false" hint="if false, defines a table with no primary key">
+		<cfargument name="id" type="boolean" required="no" default="true" hint="if false, defines a table with no primary key">
 		<cfargument name="primaryKey" type="string" required="no" default="id" hint="overrides default primary key">
 		<cfscript>
 		var loc = {};
 		loc.args = "adapter,name,force";
+		
+		this.primaryKeys = ArrayNew(1);
+		this.foreignKeys = ArrayNew(1);
+		this.columns = ArrayNew(1);
+		
 		loc.iEnd = ListLen(loc.args);
 		for (loc.i=1; loc.i <= loc.iEnd; loc.i++) {
 			loc.argumentName = ListGetAt(loc.args,loc.i);
@@ -16,16 +21,45 @@
 				this[loc.argumentName] = arguments[loc.argumentName];
 			}
 		}
-		this.columns = ArrayNew(1);
+		
 		if(arguments.id && Len(arguments.primaryKey)) {
-			column(columnName=arguments.primaryKey,columnType="primaryKey");
+			this.primaryKey(name=arguments.primaryKey, autoIncrement=true);
 		}
-		this.foreignKeys = ArrayNew(1);
 		</cfscript>
 		<cfreturn this>
 	</cffunction>
+    
+    <cffunction name="primaryKey" returntype="any" access="public" hint="adds a primary key definition to the table. this method also allows for multiple primary keys.">
+    	<cfargument name="name" type="string" required="yes" hint="primary key column name">
+        <cfargument name="type" type="string" required="false" default="integer" hint="type for the primary key column">
+        <cfargument name="autoIncrement" type="boolean" required="no" default="false">
+		<cfargument name="limit" type="numeric" required="no" hint="character or integer size">
+		<cfargument name="precision" type="numeric" required="no" hint="number of digits the column can hold">
+		<cfargument name="scale" type="numeric" required="no" hint="number of digits that can be placed to the right of the decimal point (must be less than or equal to precision)">
+        <cfargument name="references" type="string" required="no" hint="table this primary key should reference as a foreign key">
+        <cfscript>
+        var loc = {};
+		arguments.null = false;
+		arguments.adapter = this.adapter;
+		
+		// don't allow multiple autoIncrement primarykeys
+		if (ArrayLen(this.primaryKeys) && arguments.autoIncrement)
+			$throw(message="You cannot have multiple auto increment primary keys.");
+		
+		loc.column = CreateObject("component", "ColumnDefinition").init(argumentCollection=arguments);
+		ArrayAppend(this.primaryKeys, loc.column);
+			
+		if(StructKeyExists(arguments, "references"))
+		{
+			loc.referenceTable = pluralize(arguments.references);
+			loc.foreignKey = CreateObject("component","ForeignKeyDefinition").init(adapter=this.adapter,table=this.name,referenceTable=loc.referenceTable,column=arguments.name,referenceColumn="id");
+			ArrayAppend(this.foreignKeys,loc.foreignKey);
+		}
+        </cfscript>
+		<cfreturn this>
+    </cffunction>
 	
-	<cffunction name="column" returntype="void" access="public" hint="adds a column to table definition">
+	<cffunction name="column" returntype="any" access="public" hint="adds a column to table definition">
 		<cfargument name="columnName" type="string" required="yes" hint="column name">
 		<cfargument name="columnType" type="string" required="yes" hint="column type">
 		<cfargument name="default" type="string" required="no" hint="default value">
@@ -41,9 +75,10 @@
 		loc.column = CreateObject("component","ColumnDefinition").init(argumentCollection=arguments);
 		ArrayAppend(this.columns,loc.column);
 		</cfscript>
+		<cfreturn this>
 	</cffunction>
 	
-	<cffunction name="binary" returntype="void" access="public" hint="adds binary columns to table definition">
+	<cffunction name="binary" returntype="any" access="public" hint="adds binary columns to table definition">
 		<cfargument name="columnNames" type="string" required="yes" hint="one or more column names, comma delimited">
 		<cfargument name="default" type="string" required="no" hint="default value">
 		<cfargument name="null" type="boolean" required="no" hint="whether nulls are allowed">
@@ -56,9 +91,10 @@
 			column(argumentCollection=arguments);
 		}
 		</cfscript>
+		<cfreturn this>
 	</cffunction>
 
-	<cffunction name="boolean" returntype="void" access="public" hint="adds boolean columns to table definition">
+	<cffunction name="boolean" returntype="any" access="public" hint="adds boolean columns to table definition">
 		<cfargument name="columnNames" type="string" required="yes" hint="one or more column names, comma delimited">
 		<cfargument name="default" type="string" required="no" hint="default value">
 		<cfargument name="null" type="boolean" required="no" hint="whether nulls are allowed">
@@ -71,9 +107,10 @@
 			column(argumentCollection=arguments);
 		}
 		</cfscript>
+		<cfreturn this>
 	</cffunction>
 
-	<cffunction name="date" returntype="void" access="public" hint="adds date columns to table definition">
+	<cffunction name="date" returntype="any" access="public" hint="adds date columns to table definition">
 		<cfargument name="columnNames" type="string" required="yes" hint="one or more column names, comma delimited">
 		<cfargument name="default" type="string" required="no" hint="default value">
 		<cfargument name="null" type="boolean" required="no" hint="whether nulls are allowed">
@@ -86,9 +123,10 @@
 			column(argumentCollection=arguments);
 		}
 		</cfscript>
+		<cfreturn this>
 	</cffunction>
 
-	<cffunction name="datetime" returntype="void" access="public" hint="adds datetime columns to table definition">
+	<cffunction name="datetime" returntype="any" access="public" hint="adds datetime columns to table definition">
 		<cfargument name="columnNames" type="string" required="yes" hint="one or more column names, comma delimited">
 		<cfargument name="default" type="string" required="no" hint="default value">
 		<cfargument name="null" type="boolean" required="no" hint="whether nulls are allowed">
@@ -101,9 +139,10 @@
 			column(argumentCollection=arguments);
 		}
 		</cfscript>
+		<cfreturn this>
 	</cffunction>
 	
-	<cffunction name="decimal" returntype="void" access="public" hint="adds decimal columns to table definition">
+	<cffunction name="decimal" returntype="any" access="public" hint="adds decimal columns to table definition">
 		<cfargument name="columnNames" type="string" required="yes" hint="one or more column names, comma delimited">
 		<cfargument name="default" type="string" required="no" hint="default value">
 		<cfargument name="null" type="boolean" required="no" hint="whether nulls are allowed">
@@ -118,9 +157,10 @@
 			column(argumentCollection=arguments);
 		}
 		</cfscript>
+		<cfreturn this>
 	</cffunction>
 	
-	<cffunction name="float" returntype="void" access="public" hint="adds float columns to table definition">
+	<cffunction name="float" returntype="any" access="public" hint="adds float columns to table definition">
 		<cfargument name="columnNames" type="string" required="yes" hint="one or more column names, comma delimited">
 		<cfargument name="default" type="string" required="no" default="" hint="default value">
 		<cfargument name="null" type="boolean" required="no" default="true" hint="whether nulls are allowed">
@@ -133,9 +173,10 @@
 			column(argumentCollection=arguments);
 		}
 		</cfscript>
+		<cfreturn this>
 	</cffunction>
 
-	<cffunction name="integer" returntype="void" access="public" hint="adds integer columns to table definition">
+	<cffunction name="integer" returntype="any" access="public" hint="adds integer columns to table definition">
 		<cfargument name="columnNames" type="string" required="yes" hint="one or more column names, comma delimited">
 		<cfargument name="limit" type="numeric" required="no" hint="integer size">
 		<cfargument name="default" type="string" required="no" hint="default value">
@@ -149,9 +190,10 @@
 			column(argumentCollection=arguments);
 		}
 		</cfscript>
+		<cfreturn this>
 	</cffunction>
 	
-	<cffunction name="string" returntype="void" access="public" hint="adds string columns to table definition">
+	<cffunction name="string" returntype="any" access="public" hint="adds string columns to table definition">
 		<cfargument name="columnNames" type="string" required="yes" hint="one or more column names, comma delimited">
 		<cfargument name="limit" type="numeric" required="no" hint="character limit">
 		<cfargument name="default" type="string" required="no" hint="default value">
@@ -165,9 +207,10 @@
 			column(argumentCollection=arguments);
 		}
 		</cfscript>
+		<cfreturn this>
 	</cffunction>
 	
-	<cffunction name="text" returntype="void" access="public" hint="adds text columns to table definition">
+	<cffunction name="text" returntype="any" access="public" hint="adds text columns to table definition">
 		<cfargument name="columnNames" type="string" required="yes" hint="one or more column names, comma delimited">
 		<cfargument name="default" type="string" required="no" hint="default value">
 		<cfargument name="null" type="boolean" required="no" hint="whether nulls are allowed">
@@ -180,9 +223,10 @@
 			column(argumentCollection=arguments);
 		}
 		</cfscript>
+		<cfreturn this>
 	</cffunction>
 	
-	<cffunction name="time" returntype="void" access="public" hint="adds time columns to table definition">
+	<cffunction name="time" returntype="any" access="public" hint="adds time columns to table definition">
 		<cfargument name="columnNames" type="string" required="yes" hint="one or more column names, comma delimited">
 		<cfargument name="default" type="string" required="no" hint="default value">
 		<cfargument name="null" type="boolean" required="no" hint="whether nulls are allowed">
@@ -195,9 +239,10 @@
 			column(argumentCollection=arguments);
 		}
 		</cfscript>
+		<cfreturn this>
 	</cffunction>	
 	
-	<cffunction name="timestamp" returntype="void" access="public" hint="adds timestamp columns to table definition">
+	<cffunction name="timestamp" returntype="any" access="public" hint="adds timestamp columns to table definition">
 		<cfargument name="columnNames" type="string" required="yes" hint="one or more column names, comma delimited">
 		<cfargument name="default" type="string" required="no" hint="default value">
 		<cfargument name="null" type="boolean" required="no" hint="whether nulls are allowed">
@@ -210,15 +255,17 @@
 			column(argumentCollection=arguments);
 		}
 		</cfscript>
+		<cfreturn this>
 	</cffunction>
 	
-	<cffunction name="timestamps" returntype="void" access="public" hint="adds CFWheels convention automatic timestamp and soft delete columns to table definition">
+	<cffunction name="timestamps" returntype="any" access="public" hint="adds CFWheels convention automatic timestamp and soft delete columns to table definition">
 		<cfscript>
 		timestamp(columnNames="createdat,updatedat,deletedat",null=true);
 		</cfscript>
+		<cfreturn this>
 	</cffunction>
     
-	<cffunction name="references" returntype="void" access="public" hint="adds integer reference columns to table definition and creates foreign key constraints">
+	<cffunction name="references" returntype="any" access="public" hint="adds integer reference columns to table definition and creates foreign key constraints">
 		<cfargument name="referenceNames" type="string" required="yes" hint="one or more reference names (singular of referenced tables), comma delimited. eg. referenceNames=page will create a column pageId that references table:pages, column:id">
 		<cfargument name="default" type="string" required="no" default="NULL" hint="default value">
 		<cfargument name="null" type="boolean" required="no" default="true" hint="whether nulls are allowed">
@@ -229,10 +276,22 @@
 		loc.iEnd = ListLen(arguments.referenceNames);
 		for (loc.i=1; loc.i <= loc.iEnd; loc.i++) {
 			loc.referenceName = ListGetAt(arguments.referenceNames,loc.i);
-			column(columnName = loc.referenceName & "id",columnType="integer",default=arguments.default,null=arguments.null);
-			if(arguments.polymorphic) {
+			
+			// get all possible arguments for the column
+			loc.columnArgs = {};
+			for (loc.arg in ListToArray("columnType,default,null,limit,precision,scale"))
+				if (StructKeyExists(arguments, loc.arg))
+					loc.columnArgs[loc.arg] = arguments[loc.arg];
+			
+			// default the column to an integer if not provided
+			if (!StructKeyExists(loc.columnArgs, "columnType"))
+				loc.columnArgs.columnType = "integer";
+			
+			column(columnName = loc.referenceName & "id", argumentCollection=loc.columnArgs);
+			
+			if(arguments.polymorphic)
 				column(columnName=loc.referenceName & "type",columnType="string");
-			}
+			
 			if(arguments.foreignKey && !arguments.polymorphic) {
 				loc.referenceTable = pluralize(loc.referenceName);
 				loc.foreignKey = CreateObject("component","ForeignKeyDefinition").init(adapter=this.adapter,table=this.name,referenceTable=loc.referenceTable,column="#loc.referenceName#id",referenceColumn="id");
@@ -240,6 +299,7 @@
 			}
 		}
 		</cfscript>
+		<cfreturn this>
 	</cffunction>
 
 	<cffunction name="create" returntype="void" access="public" hint="creates the table in the database">
@@ -248,7 +308,7 @@
 			$execute(this.adapter.dropTable(this.name));
 			announce("Dropped table #LCase(this.name)#");
 		}
-		$execute(this.adapter.createTable(name=this.name,columns=this.columns,foreignKeys=this.foreignKeys));
+		$execute(this.adapter.createTable(name=this.name, primaryKeys=this.primaryKeys, columns=this.columns, foreignKeys=this.foreignKeys));
 		announce("Created table #LCase(this.name)#");
 		loc.iEnd = ArrayLen(this.foreignKeys);
 		for (loc.i=1; loc.i <= loc.iEnd; loc.i++) {
