@@ -5,7 +5,6 @@
 		  that sets the id value based on the next value in the sequence --->
 
 	<cfset variables.sqlTypes = {}>
-	<cfset variables.sqlTypes['primaryKey'] = "NUMBER(38) NOT NULL PRIMARY KEY">
 	<cfset variables.sqlTypes['binary'] = {name='BLOB'}>
 	<cfset variables.sqlTypes['boolean'] = {name='NUMBER',limit=1}>
 	<cfset variables.sqlTypes['date'] = {name='DATE'}>
@@ -21,6 +20,40 @@
 	<cffunction name="adapterName" returntype="string" access="public" hint="name of database adapter">
 		<cfreturn "Oracle">
 	</cffunction>
+
+	<cffunction name="addPrimaryKeyOptions" returntype="string" access="public">
+		<cfargument name="sql" type="string" required="true" hint="column definition sql">
+		<cfargument name="options" type="struct" required="false" default="#StructNew()#" hint="column options">
+		<cfscript>
+		if (StructKeyExists(arguments.options, "null") && arguments.options.null)
+			arguments.sql = arguments.sql & " NULL";
+		else
+			arguments.sql = arguments.sql & " NOT NULL";
+		
+		arguments.sql = arguments.sql & " PRIMARY KEY";
+		</cfscript>
+		<cfreturn arguments.sql>
+	</cffunction>
+    
+    <cffunction name="primaryKeyConstraint" returntype="string" access="public">
+    	<cfargument name="name" type="string" required="true">
+        <cfargument name="primaryKeys" type="array" required="true">
+        <cfscript>
+        var loc = {};
+		
+		loc.sql = "CONSTRAINT PK_#arguments.name# PRIMARY KEY (";
+		
+		for (loc.i = 1; loc.i lte loc.iEnd; loc.i++)
+		{
+			if (loc.i != 1) 
+				loc.sql = loc.sql & ", "; 
+			loc.sql = loc.sql & arguments.primaryKeys[loc.i].toColumnNameSQL();
+		}
+		
+		loc.sql = loc.sql & ")"; 
+        </cfscript>
+        <cfreturn loc.sql />
+    </cffunction>
 
 	<!--- currently leaving table names and columns unquoted
 		  my understanding is that if you use quotes when creating the tables,

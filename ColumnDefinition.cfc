@@ -6,7 +6,7 @@
 		<cfargument name="type" type="string" required="yes" hint="column type">
 		<cfscript>
 		var loc = {};
-		loc.args = "adapter,name,type,limit,precision,scale,default,null";
+		loc.args = "adapter,name,type,limit,precision,scale,default,null,autoIncrement";
 		loc.iEnd = ListLen(loc.args);
 		for (loc.i=1; loc.i <= loc.iEnd; loc.i++) {
 			loc.argumentName = ListGetAt(loc.args,loc.i);
@@ -25,6 +25,21 @@
 		</cfscript>
 		<cfreturn sql>
 	</cffunction>
+
+	<cffunction name="toColumnNameSQL" returntype="string" access="public">
+		<cfscript>
+		var sql = this.adapter.quoteColumnName(this.name);
+		</cfscript>
+		<cfreturn sql>
+	</cffunction>
+    
+    <cffunction name="toPrimaryKeySQL" returntype="string" access="public">
+		<cfscript>
+		var sql = this.adapter.quoteColumnName(this.name) & " " & sqlType();
+		sql = addPrimaryKeyOptions(sql);
+		</cfscript>
+		<cfreturn sql>
+    </cffunction>
 	
 	<cffunction name="sqlType" returntype="string" access="public">
 		<cfscript>
@@ -57,6 +72,24 @@
 			}
 		}
 		arguments.sql = this.adapter.addColumnOptions(sql=arguments.sql,options=loc.options);
+		</cfscript>
+		<cfreturn arguments.sql>
+	</cffunction>
+	
+	<cffunction name="addPrimaryKeyOptions" returntype="string" access="public">
+		<cfargument name="sql" type="string" required="yes" hint="column definition sql">
+		<cfscript>
+		var loc = {};
+		loc.options = {};
+		loc.optionalArguments = "autoIncrement,null";
+		loc.iEnd = ListLen(loc.optionalArguments);
+		for (loc.i=1; loc.i <= loc.iEnd; loc.i++) {
+			loc.argumentName = ListGetAt(loc.optionalArguments,loc.i);
+			if(StructKeyExists(this,loc.argumentName)) {
+				loc.options[loc.argumentName] = this[loc.argumentName];
+			}
+		}
+		arguments.sql = this.adapter.addPrimaryKeyOptions(sql=arguments.sql,options=loc.options);
 		</cfscript>
 		<cfreturn arguments.sql>
 	</cffunction>
