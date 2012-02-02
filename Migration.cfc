@@ -126,6 +126,26 @@
 		announce("Removed column #arguments.columnName# from #arguments.table#");
 		</cfscript>
 	</cffunction>
+	
+	<cffunction name="addReference" returntype="void" access="public" hint="add a foreign key constraint to the database, using the reference name that was used to create it">
+		<cfargument name="table" type="string" required="true" hint="table name">
+		<cfargument name="referenceName" type="string" required="true" hint="reference name that was provided to table.reference()">
+		<cfscript>
+		addForeignKey(table=arguments.table, referenceTable=pluralize(arguments.referenceName), column="#arguments.referenceName#id", referenceColumn="id");
+		</cfscript>
+	</cffunction>
+	
+	<cffunction name="addForeignKey" returntype="void" access="public" hint="add a foreign key constraint to the database, using the reference name that was used to create it">
+		<cfargument name="table" type="string" required="true" hint="table name">
+		<cfargument name="referenceTable" type="string" required="true" hint="reference table name">
+		<cfargument name="column" type="string" required="true" hint="column name">
+		<cfargument name="referenceColumn" type="string" required="true" hint="reference column name">
+		<cfscript>
+		var foreignKey = loc.foreignKey = CreateObject("component","ForeignKeyDefinition").init(adapter=this.adapter, argumentCollection=arguments);
+		$execute(this.adapter.addForeignKeyToTable(name=arguments.table, foreignKey=foreignKey));
+		announce("Added foreign key #foreignKey.name#");
+		</cfscript>
+	</cffunction>
 
 	<cffunction name="dropReference" returntype="void" access="public" hint="drop a foreign key constraint from the database, using the reference name that was used to create it">
 		<cfargument name="table" type="string" required="true" hint="table name">
