@@ -2,7 +2,7 @@
 
 	<cfset variables.sqlTypes = {}>
 	<cfset variables.sqlTypes['binary'] = {name='BLOB'}>
-	<cfset variables.sqlTypes['boolean'] = {name='TINYINT',limit=1}>
+	<cfset variables.sqlTypes['boolean'] = {name='BIT'}>
 	<cfset variables.sqlTypes['date'] = {name='DATE'}>
 	<cfset variables.sqlTypes['datetime'] = {name='DATETIME'}>
 	<cfset variables.sqlTypes['decimal'] = {name='DECIMAL'}>
