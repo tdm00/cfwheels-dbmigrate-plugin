@@ -196,4 +196,46 @@
 		</cfloop>
 	</cffunction>
 
+	<cffunction name="typeToSQL" returntype="string">
+		<cfargument name="type" type="string" required="true" hint="column type">
+		<cfargument name="options" type="struct" required="false" default="#StructNew()#" hint="column options">
+		<cfscript>
+		var sql = '';
+		if(IsDefined("variables.sqlTypes") && structKeyExists(variables.sqlTypes,arguments.type)) {
+			if(IsStruct(variables.sqlTypes[arguments.type])) {
+				sql = variables.sqlTypes[arguments.type]['name'];
+				if(arguments.type == 'decimal') {
+					if(!StructKeyExists(arguments.options,'precision') && StructKeyExists(variables.sqlTypes[arguments.type],'precision')) {
+						arguments.options.precision = variables.sqlTypes[arguments.type]['precision'];
+					}
+					if(!StructKeyExists(arguments.options,'scale') && StructKeyExists(variables.sqlTypes[arguments.type],'scale')) {
+						arguments.options.scale = variables.sqlTypes[arguments.type]['scale'];
+					}
+					if(StructKeyExists(arguments.options,'precision')) {
+						if(StructKeyExists(arguments.options,'scale')) {
+							sql = sql & '(#arguments.options.precision#,#arguments.options.scale#)';
+						} else {
+							sql = sql & '(#arguments.options.precision#)';
+						}
+					}
+				} else if(arguments.type == 'integer') {
+					if(StructKeyExists(arguments.options,'limit')) {
+						sql = sql;
+					}
+				} else {
+					if(!StructKeyExists(arguments.options,'limit') && StructKeyExists(variables.sqlTypes[arguments.type],'limit')) {
+						arguments.options.limit = variables.sqlTypes[arguments.type]['limit'];
+					}
+					if(StructKeyExists(arguments.options,'limit')) {
+						sql = sql & '(#arguments.options.limit#)';
+					}
+				}
+			} else {
+				sql = variables.sqlTypes[arguments.type];
+			}
+		}
+		</cfscript>
+		<cfreturn sql>
+	</cffunction>
+
 </cfcomponent>
