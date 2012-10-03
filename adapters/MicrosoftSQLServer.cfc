@@ -1,6 +1,7 @@
 <cfcomponent extends="Abstract">
 
 	<cfset variables.sqlTypes = {}>
+	<cfset variables.sqlTypes['primaryKey'] = "int NOT NULL IDENTITY (1, 1)">
 	<cfset variables.sqlTypes['binary'] = {name='IMAGE'}>
 	<cfset variables.sqlTypes['boolean'] = {name='BIT'}>
 	<cfset variables.sqlTypes['date'] = {name='DATETIME'}>
