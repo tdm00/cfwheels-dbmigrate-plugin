@@ -73,6 +73,8 @@
 					arguments.sql = arguments.sql & " DEFAULT NULL";
 				} else if(arguments.options.type == 'boolean') {
 					arguments.sql = arguments.sql & " DEFAULT #IIf(arguments.options.default,1,0)#";
+				} else if(arguments.options.type == 'string' && arguments.options.default eq "") {
+					arguments.sql = arguments.sql;
 				} else {
 					arguments.sql = arguments.sql & " DEFAULT #quote(value=arguments.options.default,options=arguments.options)#";
 				}
