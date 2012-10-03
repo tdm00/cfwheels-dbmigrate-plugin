@@ -35,25 +35,25 @@
 		<cfreturn arguments.sql>
 	</cffunction>
     
-    <cffunction name="primaryKeyConstraint" returntype="string" access="public">
-    	<cfargument name="name" type="string" required="true">
-        <cfargument name="primaryKeys" type="array" required="true">
-        <cfscript>
-        var loc = {};
-		
-		loc.sql = "CONSTRAINT [PK_#arguments.name#] PRIMARY KEY CLUSTERED (";
-		
-		for (loc.i = 1; loc.i lte ArrayLen(arguments.primaryKeys); loc.i++)
-		{
-			if (loc.i != 1) 
-				loc.sql = loc.sql & ", "; 
-			loc.sql = loc.sql & arguments.primaryKeys[loc.i].toColumnNameSQL() & " ASC";
-		}
-		
-		loc.sql = loc.sql & ")"; 
-        </cfscript>
-        <cfreturn loc.sql />
-    </cffunction>
+  <cffunction name="primaryKeyConstraint" returntype="string" access="public">
+  	<cfargument name="name" type="string" required="true">
+      <cfargument name="primaryKeys" type="array" required="true">
+      <cfscript>
+      var loc = {};
+	
+	loc.sql = "CONSTRAINT [PK_#arguments.name#] PRIMARY KEY CLUSTERED (";
+	
+	for (loc.i = 1; loc.i lte ArrayLen(arguments.primaryKeys); loc.i++)
+	{
+		if (loc.i != 1) 
+			loc.sql = loc.sql & ", "; 
+		loc.sql = loc.sql & arguments.primaryKeys[loc.i].toColumnNameSQL() & " ASC";
+	}
+	
+	loc.sql = loc.sql & ")"; 
+      </cfscript>
+      <cfreturn loc.sql />
+  </cffunction>
 
 	<!---  SQL Server uses square brackets to escape table and column names --->
 	<cffunction name="quoteTableName" returntype="string" access="public" hint="surrounds table or index names with quotes">
@@ -140,9 +140,11 @@
 				AND column_name =
 					<cfqueryparam cfsqltype="cf_sql_varchar" value="#arguments.columnName#">
 		</cfquery>
-		<cfloop query="loc.constraints">
-			<cfset $execute("ALTER TABLE #quoteTableName(LCase(arguments.name))# DROP CONSTRAINT #loc.constraints.constraint#")>
-		</cfloop>
+		<cfif loc.constraints.RecordCount GT 0>
+			<cfloop query="loc.constraints">
+				<cfset $execute("ALTER TABLE #quoteTableName(LCase(arguments.name))# DROP CONSTRAINT #loc.constraints.constraint_name#")>
+			</cfloop>
+		</cfif>
 	</cffunction>
 
 	<cffunction name="$removeDefaultConstraint" access="private" hint="SQL Server: Removes default constraints on a given column.">
@@ -152,18 +154,20 @@
 		<cfquery name="loc.constraints" datasource="#application.wheels.dataSourceName#" username="#application.wheels.dataSourceUserName#" password="#application.wheels.dataSourcePassword#">
 			EXEC sp_helpconstraint #quoteTableName(LCase(arguments.name))#, 'nomsg'
 		</cfquery>
-		<cfquery name="loc.constraints" dbtype="query">
-			SELECT
-				*
-			FROM
-				[loc].[constraints]
-			WHERE
-				constraint_type =
-					<cfqueryparam cfsqltype="cf_sql_varchar" value="DEFAULT on column #arguments.columnName#">
-		</cfquery>
-		<cfloop query="loc.constraints">
-			<cfset $execute("ALTER TABLE #quoteTableName(LCase(arguments.name))# DROP CONSTRAINT #loc.constraints.constraint_name#")>
-		</cfloop>
+		<cfif StructKeyExists(loc, "constraints") And loc.constraints.RecordCount NEQ "" And loc.constraints.RecordCount GT 0>
+			<cfquery name="loc.constraints" dbtype="query">
+				SELECT
+					*
+				FROM
+					[loc].[constraints]
+				WHERE
+					constraint_type =
+						<cfqueryparam cfsqltype="cf_sql_varchar" value="DEFAULT on column #arguments.columnName#">
+			</cfquery>
+			<cfloop query="loc.constraints">
+				<cfset $execute("ALTER TABLE #quoteTableName(LCase(arguments.name))# DROP CONSTRAINT #loc.constraints.constraint_name#")>
+			</cfloop>
+		</cfif>
 	</cffunction>
 
 	<cffunction name="$removeIndexes" access="private" hint="SQL Server: Removes all indexes on a given column.">
