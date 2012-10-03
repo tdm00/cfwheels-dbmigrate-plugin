@@ -4,7 +4,9 @@
 	$file
 	$dbinfo
 	 --->
-<cfinclude template="../../wheels/global/functions.cfm">
+<cfif StructKeyExists(server, "railo")>
+	<cfinclude template="../../wheels/global/functions.cfm">
+</cfif>
 
 <cffunction name="announce" access="public">
 	<cfargument name="message" type="string" required="yes">
