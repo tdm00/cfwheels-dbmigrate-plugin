@@ -239,4 +239,14 @@
 		<cfreturn sql>
 	</cffunction>
 
+	<cffunction name="addRecordPrefix" returntype="string" access="public" hint="prepends sql server identity_insert on to allow inserting primary key values">
+		<cfargument name="table" type="string" required="true" hint="table name">
+		<cfreturn "SET IDENTITY_INSERT #quoteTableName(LCase(arguments.table))# ON">
+	</cffunction>
+
+	<cffunction name="addRecordSuffix" returntype="string" access="public" hint="appends sql server identity_insert on to disallow inserting primary key values">
+		<cfargument name="table" type="string" required="true" hint="table name">
+		<cfreturn "SET IDENTITY_INSERT #quoteTableName(LCase(arguments.table))# OFF">
+	</cffunction>
+
 </cfcomponent>

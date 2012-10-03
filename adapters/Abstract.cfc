@@ -248,4 +248,12 @@
 		<cfreturn "DROP INDEX #quoteTableName(arguments.indexName)#">
 	</cffunction>
 
+	<cffunction name="addRecordPrefix" returntype="string" access="public" hint="generates sql to remove a database index">
+		<cfreturn "">
+	</cffunction>
+
+	<cffunction name="addRecordSuffix" returntype="string" access="public" hint="generates sql to remove a database index">
+		<cfreturn "">
+	</cffunction>
+
 </cfcomponent>
