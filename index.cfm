@@ -1,4 +1,5 @@
 <cfsetting enablecfoutputonly="true">
+<cfinclude template="basefunctions.cfm">
 
 <cfset dbmigrateMeta = {}>
 <cfset dbmigrateMeta.version = "1.0.0">
@@ -44,6 +45,7 @@
 
 <h2>Datasource</h2>
 <p>Current datasource is <strong>#application.wheels.dataSourceName#</strong></p>
+<p>Current database type is <strong>#$getDBType()#</strong></p>
 
 <h2>Current version</h2>
 <p>Current database version is <strong>#currentVersion#</strong></p>
