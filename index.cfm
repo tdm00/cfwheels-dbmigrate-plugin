@@ -1,5 +1,4 @@
 <cfsetting enablecfoutputonly="true">
-<cfinclude template="basefunctions.cfm">
 
 <cfset dbmigrateMeta = {}>
 <cfset dbmigrateMeta.version = "1.0.0">
@@ -43,16 +42,23 @@
 	<pre>#flash("dbmigrateFeedback")#</pre>
 </cfif>
 
-<h2>Datasource</h2>
-<p>Current datasource is <strong>#application.wheels.dataSourceName#</strong></p>
-<p>Current database type is <strong>#$getDBType()#</strong></p>
-
-<h2>Current version</h2>
-<p>Current database version is <strong>#currentVersion#</strong></p>
+<table class="table table-condensed table-bordered">
+	<tr>
+		<th>Database Version</th>
+		<th>Datasource</th>
+		<th>Database Type</th>
+	</tr>
+	<tr>
+		<td>#currentVersion#</td>
+		<td>#application.wheels.dataSourceName#</td>
+		<td></td>
+	</tr>
+</table>
 
 <cfif ArrayLen(migrations) gt 0>
-	<h2>Migrate</h2>
-	<form action="#CGI.script_name & '?' & CGI.query_string# & '&requesttimeout=99999'" method="post">
+	<h2>Migrate</h2> 
+	<cfset goTo = "#CGI.script_name#" & '?' & #CGI.query_string# & "&requesttimeout=99999">
+	<form action="#goTo#" method="post">
 	<p>Migrate to version
 	<select name="version">
 	<cfif lastVersion neq 0><option value="#lastVersion#" selected="selected">All non-migrated</option></cfif>
@@ -61,22 +67,35 @@
 	<option value="#migration.version#">#migration.version# - #migration.name# <cfif migration.status eq "migrated">(migrated)<cfelse>(not migrated)</cfif></option>
 	</cfloop>
 	</select>
-	<input type="submit" value="go">
+	<input type="submit" value="Get Migrating!" class="btn btn-success">
 	</p>
 	</form>
 
 	<!--- List migrations available --->
 	<h2>Available migrations</h2>
-	<p>
-	<cfloop array="#migrations#" index="migration">
-		<span<cfif migration.status eq "migrated"> style="font-weight:bold;"</cfif>>
-			#migration.version# - #migration.name#
-			<cfif migration.loadError neq ""> (load error: #migration.loadError#)</cfif>
-			<cfif migration.details neq ""> (#migration.details#)</cfif>
-			- <em><cfif migration.status eq "migrated">migrated<cfelse>not migrated</cfif></em>
-		</span><br />
-	</cfloop>
-	</p>
+		<table class="table table-condensed table-bordered">
+			<tr>
+				<th>Version</th>
+				<th>Details</th>
+			</tr>
+			<cfloop array="#migrations#" index="migration">
+				<cfif migration.status eq "migrated">
+					<cfset rowClass = "alert alert-success">
+				<cfelseif migration.loadError neq "">
+					<cfset rowClass = "alert alert-error">
+				<cfelse>
+					<cfset rowClass = "">
+				</cfif>
+				<tr class="#rowClass#">
+					<td>#migration.version#</td>
+					<td>
+						Name: #migration.name# <br>
+						<cfif migration.details neq "">Details: #migration.details# <br></cfif>
+						<cfif migration.loadError neq "">Error: #migration.loadError# <br></cfif>
+					</td>
+				</tr>
+			</cfloop>
+		</table>
 </cfif>
 
 	<h2 style="padding-top:10px;">Create new migration file from template</h2>
