@@ -3,7 +3,9 @@
 	model
 	$dbinfo
 	 --->
-<cfinclude template="../../wheels/global/functions.cfm">
+<cfif not StructKeyExists(variables, "$wddx")>
+	<cfinclude template="../../wheels/global/functions.cfm">
+</cfif>
 
 <cffunction name="announce" access="public">
 	<cfargument name="message" type="string" required="yes">
