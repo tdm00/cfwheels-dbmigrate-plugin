@@ -52,7 +52,7 @@
 
 <cfif ArrayLen(migrations) gt 0>
 	<h2>Migrate</h2>
-	<form action="#CGI.script_name & '?' & CGI.query_string# & '&requesttimeout=99999'" method="post">
+	<form action="#CGI.script_name & '?' & CGI.query_string#&requesttimeout=99999" method="post">
 	<p>Migrate to version
 	<select name="version">
 	<cfif lastVersion neq 0><option value="#lastVersion#" selected="selected">All non-migrated</option></cfif>
