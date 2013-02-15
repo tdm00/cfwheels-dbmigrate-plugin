@@ -8,7 +8,7 @@
 	<cfset variables.sqlTypes['datetime'] = {name='DATETIME'}>
 	<cfset variables.sqlTypes['decimal'] = {name='DECIMAL'}>
 	<cfset variables.sqlTypes['float'] = {name='FLOAT'}>
-	<cfset variables.sqlTypes['integer'] = {name='INT'}>
+	<cfset variables.sqlTypes['integer'] = {name='INT UNSIGNED'}>
 	<cfset variables.sqlTypes['string'] = {name='VARCHAR',limit=255}>
 	<cfset variables.sqlTypes['text'] = {name='TEXT'}>
 	<cfset variables.sqlTypes['time'] = {name='TIME'}>
