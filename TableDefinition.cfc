@@ -267,8 +267,8 @@
     
 	<cffunction name="references" returntype="any" access="public" hint="adds integer reference columns to table definition and creates foreign key constraints">
 		<cfargument name="referenceNames" type="string" required="yes" hint="one or more reference names (singular of referenced tables), comma delimited. eg. referenceNames=page will create a column pageId that references table:pages, column:id">
-		<cfargument name="default" type="string" required="no" default="NULL" hint="default value">
-		<cfargument name="null" type="boolean" required="no" default="true" hint="whether nulls are allowed">
+		<cfargument name="default" type="string" required="no" hint="default value">
+		<cfargument name="null" type="boolean" required="no" default="false" hint="whether nulls are allowed">
 		<cfargument name="polymorphic" type="boolean" required="no" default="false" hint="whether or not to create an Id/Type pair of columns for a polymorphic relationship">
 		<cfargument name="foreignKey" type="boolean" required="no" default="true" hint="whether or not to create a foreign key constraint">
 		<cfscript>

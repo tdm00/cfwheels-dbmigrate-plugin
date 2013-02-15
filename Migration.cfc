@@ -55,9 +55,12 @@
     	var loc = {};
     	loc.foreignKeys = $getForeignKeys(arguments.name);
     	loc.iEnd = ListLen(loc.foreignKeys);
-    	for (loc.i=1; loc.i <= loc.iEnd; loc.i++) {
-    		loc.foreignKeyName = ListGetAt(loc.foreignKeys,loc.i);
-    		dropForeignKey(table=arguments.name,keyname=loc.foreignKeyName);
+    	if (application.wheel.serverName != "railo")
+    	{
+    		for (loc.i=1; loc.i <= loc.iEnd; loc.i++) {
+    			loc.foreignKeyName = ListGetAt(loc.foreignKeys,loc.i);
+    			dropForeignKey(table=arguments.name,keyname=loc.foreignKeyName);
+    		}
     	}
     $execute(this.adapter.dropTable(name=arguments.name));
     announce("Dropped table #arguments.name#");
@@ -141,7 +144,7 @@
 		<cfargument name="column" type="string" required="true" hint="column name">
 		<cfargument name="referenceColumn" type="string" required="true" hint="reference column name">
 		<cfscript>
-		var foreignKey = loc.foreignKey = CreateObject("component","ForeignKeyDefinition").init(adapter=this.adapter, argumentCollection=arguments);
+		var foreignKey = CreateObject("component","ForeignKeyDefinition").init(adapter=this.adapter, argumentCollection=arguments);
 		$execute(this.adapter.addForeignKeyToTable(name=arguments.table, foreignKey=foreignKey));
 		announce("Added foreign key #foreignKey.name#");
 		</cfscript>
