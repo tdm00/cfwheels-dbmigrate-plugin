@@ -52,7 +52,7 @@
 		<cfargument name="type" type="string" required="false" hint="column type">
 		<cfargument name="default" type="string" required="false" default="" hint="default value">
 		<cfargument name="null" type="boolean" required="false" default="true" hint="whether nulls are allowed">
-		<cfif arguments.type eq "text">
+		<cfif ListFindNoCase("text,float", arguments.type)>
 			<cfreturn false>
 		<cfelse>
 			<cfreturn true>
