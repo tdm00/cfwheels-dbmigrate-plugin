@@ -1,10 +1,11 @@
 <!--- we include wheels global functions for:-
 	pluralize
 	model
-	$file
 	$dbinfo
 	 --->
-<cfinclude template="../../wheels/global/functions.cfm">
+<cfif not StructKeyExists(variables, "$wddx")>
+	<cfinclude template="../../wheels/global/functions.cfm">
+</cfif>
 
 <cffunction name="announce" access="public">
 	<cfargument name="message" type="string" required="yes">
@@ -14,13 +15,11 @@
 
 <cffunction name="$execute" access="private">
 	<cfargument name="sql" type="string" required="yes">
-	<cfscript>
-	// trim and remove trailing semicolon (appears to cause problems for Oracle thin client JDBC driver)
-	arguments.sql = REReplace(trim(arguments.sql),";$","","ONE");
-	if(IsDefined("Request.migrationSQLFile")) {
-		$file(action="append",file=Request.migrationSQLFile,output="#arguments.sql#;",addNewLine="yes",fixNewLine="yes");
-	}
-	</cfscript>
+	<!--- trim and remove trailing semicolon (appears to cause problems for Oracle thin client JDBC driver) --->
+	<cfset arguments.sql = REReplace(trim(arguments.sql),";$","","ONE")>
+	<cfif StructKeyExists(Request, "migrationSQLFile")>
+		<cffile action="append" file="#Request.migrationSQLFile#" output="#arguments.sql#;" addNewLine="yes" fixNewLine="yes">
+	</cfif>
 	<cfquery datasource="#application.wheels.dataSourceName#" username="#application.wheels.dataSourceUserName#" password="#application.wheels.dataSourcePassword#">
 	#PreserveSingleQuotes(arguments.sql)#
 	</cfquery>

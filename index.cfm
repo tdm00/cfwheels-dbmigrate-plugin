@@ -56,9 +56,8 @@
 </table>
 
 <cfif ArrayLen(migrations) gt 0>
-	<h2>Migrate</h2> 
-	<cfset goTo = "#CGI.script_name#" & '?' & #CGI.query_string# & "&requesttimeout=99999">
-	<form action="#goTo#" method="post">
+	<h2>Migrate</h2>
+	<form action="#CGI.script_name & '?' & CGI.query_string#&requesttimeout=99999" method="post">
 	<p>Migrate to version
 	<select name="version">
 	<cfif lastVersion neq 0><option value="#lastVersion#" selected="selected">All non-migrated</option></cfif>
