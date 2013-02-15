@@ -70,6 +70,7 @@
 	<cffunction name="addColumn" returntype="void" access="public" hint="adds a column to existing table">
 		<cfargument name="table" type="string" required="true" hint="table name">
 		<cfargument name="columnType" type="string" required="true" hint="column type">
+		<cfargument name="afterColumn" type="string" required="false" default="" />
 		<cfargument name="columnName" type="string" required="false" default="" hint="column name">
 		<cfargument name="referenceName" type="string" required="false" default="" hint="reference name">
 		<cfargument name="default" type="string" required="false" hint="default value">
@@ -87,6 +88,7 @@
 		<cfargument name="table" type="string" required="true" hint="table name">
 		<cfargument name="columnName" type="string" required="true" hint="column name">
 		<cfargument name="columnType" type="string" required="true" hint="column type">
+		<cfargument name="afterColumn" type="string" required="false" default="" />
 		<cfargument name="referenceName" type="string" required="false" default="" hint="reference name">
 		<cfargument name="default" type="string" required="false" hint="default value">
 		<cfargument name="null" type="boolean" required="false" hint="whether nulls are allowed">

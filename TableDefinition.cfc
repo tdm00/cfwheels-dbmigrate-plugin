@@ -350,8 +350,11 @@
 		loc.iEnd = ArrayLen(this.columns);
 		for (loc.i=1; loc.i <= loc.iEnd; loc.i++) {
 			if(arguments.addColumns || !ListFindNoCase(loc.existingColumns,this.columns[loc.i].name)) {
-				$execute(this.adapter.addColumnToTable(name=this.name,column=this.columns[loc.i]));
-				announce("Added column #this.columns[loc.i].name# to table #this.name#");
+				if (structKeyExists(arguments, "afterColumn") and len(arguments.afterColumn))
+					$execute(this.adapter.addColumnToTable(name=this.name,column=this.columns[loc.i], after=arguments.afterColumn));
+				else
+					$execute(this.adapter.addColumnToTable(name=this.name,column=this.columns[loc.i]));
+					announce("Added column #this.columns[loc.i].name# to table #this.name#");
 			} else {
 				$execute(this.adapter.changeColumnInTable(name=this.name,column=this.columns[loc.i]));
 				announce("Changed column #this.columns[loc.i].name# in table #this.name#");

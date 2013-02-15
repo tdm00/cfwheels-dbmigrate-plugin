@@ -179,7 +179,12 @@
 	<cffunction name="addColumnToTable" returntype="string" access="public" hint="generates sql to add a new column to a table">
 		<cfargument name="name" type="string" required="true" hint="table name">
 		<cfargument name="column" type="any" required="true" hint="column definition object">
-		<cfreturn "ALTER TABLE #quoteTableName(LCase(arguments.name))# ADD COLUMN #arguments.column.toSQL()#">
+		<cfargument name="after" type="string" required="false" default="">
+		<cfset var string = "ALTER TABLE #quoteTableName(LCase(arguments.name))# ADD COLUMN #arguments.column.toSQL()#" />
+		<cfif len(arguments.after)>
+			 <cfreturn string & " AFTER #arguments.after#" />
+		</cfif>
+	 <cfreturn string>
 	</cffunction>
 	
 	<cffunction name="changeColumnInTable" returntype="string" access="public" hint="generates sql to change an existing column in a table">
