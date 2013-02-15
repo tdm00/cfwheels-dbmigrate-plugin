@@ -3,6 +3,8 @@
 <cfset dbmigrateMeta = {}>
 <cfset dbmigrateMeta.version = "1.0.0">
 
+<cfinclude template="basefunctions.cfm">
+
 <cfif isDefined("Form.version")>
 	<cfset flashInsert(dbmigrateFeedback=application.wheels.plugins.dbmigrate.migrateTo(Form.version))>
 	<cfset redirectTo(back=true)>
@@ -20,6 +22,9 @@
 
 <!--- Get current database version --->
 <cfset currentVersion = application.wheels.plugins.dbmigrate.getCurrentMigrationVersion()>
+
+<!--- Get database type --->
+<cfset databaseType = #$getDBType()#>
 
 <!--- Get current list of migrations --->
 <cfset migrations = application.wheels.plugins.dbmigrate.getAvailableMigrations()>
@@ -55,7 +60,7 @@
 			<th>Database Version</th>
 		</tr>
 		<tr>
-			<td></td>
+			<td>#databaseType#</td>
 			<td>#application.wheels.dataSourceName#</td>
 			<td>#currentVersion#</td>
 		</tr>
