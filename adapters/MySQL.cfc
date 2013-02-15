@@ -1,6 +1,7 @@
 <cfcomponent extends="Abstract">
 
 	<cfset variables.sqlTypes = {}>
+	<cfset variables.sqlTypes['biginteger'] = {name='BITINT UNSIGNED', limit=16}>
 	<cfset variables.sqlTypes['binary'] = {name='BLOB'}>
 	<cfset variables.sqlTypes['boolean'] = {name='TINYINT',limit=1}>
 	<cfset variables.sqlTypes['date'] = {name='DATE'}>
