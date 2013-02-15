@@ -219,7 +219,33 @@
 		<cfargument name="referenceTable" type="string" required="yes" hint="referenced table name">
 		<cfargument name="column" type="string" required="yes" hint="column name">
 		<cfargument name="referenceColumn" type="string" required="yes" hint="referenced column name">
-		<cfreturn "CONSTRAINT #quoteTableName(arguments.name)# FOREIGN KEY (#quoteColumnName(arguments.column)#) REFERENCES #LCase(arguments.referenceTable)#(#quoteColumnName(arguments.referenceColumn)#)">
+		<cfargument name="onUpdate" type="string" required="false" default="">
+		<cfargument name="onDelete" type="string" required="false" default="">
+
+		<cfscript>
+			var loc = { sql = "CONSTRAINT #quoteTableName(arguments.name)# FOREIGN KEY (#quoteColumnName(arguments.column)#) REFERENCES #LCase(arguments.referenceTable)#(#quoteColumnName(arguments.referenceColumn)#)" };
+			for (loc.item in listToArray("onUpdate,onDelete"))
+				{
+					if (len(arguments[loc.item]))
+					{
+						switch (arguments[loc.item])
+						{
+							case "none":
+								loc.sql = loc.sql & " " & uCase(humanize(loc.item)) & " NO ACTION";
+								break;
+
+							case "null":
+								loc.sql = loc.sql & " " & uCase(humanize(loc.item)) & " SET NULL";
+								break;
+
+							default:
+								loc.sql = loc.sql & " " & uCase(humanize(loc.item)) & " CASCADE";
+								break;
+						}
+					}
+				}
+		</cfscript>
+		<cfreturn loc.sql>
 	</cffunction>
 	
 	<cffunction name="addIndex" returntype="string" access="public" hint="generates sql to add database index on a table column">
