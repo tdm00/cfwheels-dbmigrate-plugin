@@ -101,6 +101,9 @@
 		<cfargument name="value" type="string" required="true" hint="value to be quoted">
 		<cfargument name="options" type="struct" required="false" default="#StructNew()#" hint="column options">
 		<cfscript>
+			if (listFindNoCase("CURRENT_TIMESTAMP", arguments.value))
+				return arguments.value;
+
 			if(StructKeyExists(arguments.options,'type') && ListFindNoCase("binary,date,datetime,time,timestamp",arguments.options.type)) {
 				arguments.value = "'#arguments.value#'";
 			}

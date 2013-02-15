@@ -268,14 +268,14 @@
 		<cfargument name="columnNames" type="string" required="yes" hint="one or more column names, comma delimited">
 		<cfargument name="default" type="string" required="no" hint="default value">
 		<cfargument name="null" type="boolean" required="no" hint="whether nulls are allowed">
+		<cfargument name="columnType" type="string" required="false" default="datetime" />
 		<cfscript>
-		var loc = {};
-		arguments.columnType = "timestamp";
-		loc.iEnd = ListLen(arguments.columnNames);
-		for (loc.i=1; loc.i <= loc.iEnd; loc.i++) {
-			arguments.columnName = ListGetAt(arguments.columnNames,loc.i);
-			column(argumentCollection=arguments);
-		}
+			var loc = {};
+			loc.iEnd = ListLen(arguments.columnNames);
+			for (loc.i=1; loc.i <= loc.iEnd; loc.i++) {
+				arguments.columnName = ListGetAt(arguments.columnNames,loc.i);
+				column(argumentCollection=arguments);
+			}
 		</cfscript>
 		<cfreturn this>
 	</cffunction>
