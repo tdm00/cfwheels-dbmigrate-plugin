@@ -53,10 +53,10 @@
 		<cfargument name="name" type="string" required="true" hint="table name">
 		<cfscript>
     	var loc = {};
-    	loc.foreignKeys = $getForeignKeys(arguments.name);
-    	loc.iEnd = ListLen(loc.foreignKeys);
-    	if (application.wheel.serverName != "railo")
+    	if (application.wheels.serverName != "railo")
     	{
+				loc.foreignKeys = $getForeignKeys(arguments.name);
+				loc.iEnd = ListLen(loc.foreignKeys);
     		for (loc.i=1; loc.i <= loc.iEnd; loc.i++) {
     			loc.foreignKeyName = ListGetAt(loc.foreignKeys,loc.i);
     			dropForeignKey(table=arguments.name,keyname=loc.foreignKeyName);
