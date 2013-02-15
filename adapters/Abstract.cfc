@@ -67,22 +67,25 @@
 		<cfargument name="sql" type="string" required="true" hint="column definition sql">
 		<cfargument name="options" type="struct" required="false" default="#StructNew()#" hint="column options">
 		<cfscript>
-		if(StructKeyExists(arguments.options,'type') && arguments.options.type != 'primaryKey') {
-			if(StructKeyExists(arguments.options,'default') && optionsIncludeDefault(argumentCollection=arguments.options)) {
-				if(arguments.options.default eq "NULL" || (arguments.options.default eq "" && ListFindNoCase("boolean,date,datetime,time,timestamp,decimal,float,integer",arguments.options.type))) {
-					arguments.sql = arguments.sql & " DEFAULT NULL";
-				} else if(arguments.options.type == 'boolean') {
-					arguments.sql = arguments.sql & " DEFAULT #IIf(arguments.options.default,1,0)#";
-				} else if(arguments.options.type == 'string' && arguments.options.default eq "") {
-					arguments.sql = arguments.sql;
-				} else {
-					arguments.sql = arguments.sql & " DEFAULT #quote(value=arguments.options.default,options=arguments.options)#";
+			if(StructKeyExists(arguments.options,'type') && arguments.options.type != 'primaryKey') {
+				if(StructKeyExists(arguments.options,'default') && optionsIncludeDefault(argumentCollection=arguments.options)) {
+					if(arguments.options.default eq "NULL" || (arguments.options.default eq "" && ListFindNoCase("boolean,date,datetime,time,timestamp,decimal,float,integer",arguments.options.type))) {
+						arguments.sql = arguments.sql & " DEFAULT NULL";
+					} else if(arguments.options.type == 'boolean') {
+						arguments.sql = arguments.sql & " DEFAULT #IIf(arguments.options.default,1,0)#";
+					} else if(arguments.options.type == 'string' && arguments.options.default eq "") {
+						arguments.sql = arguments.sql;
+					} else {
+						arguments.sql = arguments.sql & " DEFAULT #quote(value=arguments.options.default,options=arguments.options)#";
+					}
+				}
+				if(StructKeyExists(arguments.options,'null') && !arguments.options.null) {
+					arguments.sql = arguments.sql & " NOT NULL";
 				}
 			}
-			if(StructKeyExists(arguments.options,'null') && !arguments.options.null) {
-				arguments.sql = arguments.sql & " NOT NULL";
-			}
-		}
+
+			if (structKeyExists(arguments.options, "afterColumn"))
+				arguments.sql = arguments.sql & " AFTER #arguments.options.afterColumn#";
 		</cfscript>
 		<cfreturn arguments.sql>
 	</cffunction>
@@ -179,12 +182,7 @@
 	<cffunction name="addColumnToTable" returntype="string" access="public" hint="generates sql to add a new column to a table">
 		<cfargument name="name" type="string" required="true" hint="table name">
 		<cfargument name="column" type="any" required="true" hint="column definition object">
-		<cfargument name="after" type="string" required="false" default="">
-		<cfset var string = "ALTER TABLE #quoteTableName(LCase(arguments.name))# ADD COLUMN #arguments.column.toSQL()#" />
-		<cfif len(arguments.after)>
-			 <cfreturn string & " AFTER #arguments.after#" />
-		</cfif>
-	 <cfreturn string>
+		<cfreturn var string = "ALTER TABLE #quoteTableName(LCase(arguments.name))# ADD COLUMN #arguments.column.toSQL()#" />
 	</cffunction>
 	
 	<cffunction name="changeColumnInTable" returntype="string" access="public" hint="generates sql to change an existing column in a table">

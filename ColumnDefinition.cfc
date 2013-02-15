@@ -6,7 +6,7 @@
 		<cfargument name="type" type="string" required="yes" hint="column type">
 		<cfscript>
 		var loc = {};
-		loc.args = "adapter,name,type,limit,precision,scale,default,null,autoIncrement";
+		loc.args = "adapter,name,type,limit,precision,scale,default,null,autoIncrement,afterColumn";
 		loc.iEnd = ListLen(loc.args);
 		for (loc.i=1; loc.i <= loc.iEnd; loc.i++) {
 			loc.argumentName = ListGetAt(loc.args,loc.i);
@@ -63,7 +63,7 @@
 		<cfscript>
 		var loc = {};
 		loc.options = {};
-		loc.optionalArguments = "type,default,null";
+		loc.optionalArguments = "type,default,null,afterColumn";
 		loc.iEnd = ListLen(loc.optionalArguments);
 		for (loc.i=1; loc.i <= loc.iEnd; loc.i++) {
 			loc.argumentName = ListGetAt(loc.optionalArguments,loc.i);
