@@ -73,6 +73,8 @@
 					arguments.sql = arguments.sql & " DEFAULT NULL";
 				} else if(arguments.options.type == 'boolean') {
 					arguments.sql = arguments.sql & " DEFAULT #IIf(arguments.options.default,1,0)#";
+				} else if(arguments.options.type == 'string' && arguments.options.default eq "") {
+					arguments.sql = arguments.sql;
 				} else {
 					arguments.sql = arguments.sql & " DEFAULT #quote(value=arguments.options.default,options=arguments.options)#";
 				}
@@ -244,6 +246,14 @@
 		<cfargument name="table" type="string" required="true" hint="table name">
 		<cfargument name="indexName" type="string" required="false" default="" hint="index name">
 		<cfreturn "DROP INDEX #quoteTableName(arguments.indexName)#">
+	</cffunction>
+
+	<cffunction name="addRecordPrefix" returntype="string" access="public" hint="generates sql to remove a database index">
+		<cfreturn "">
+	</cffunction>
+
+	<cffunction name="addRecordSuffix" returntype="string" access="public" hint="generates sql to remove a database index">
+		<cfreturn "">
 	</cffunction>
 
 </cfcomponent>

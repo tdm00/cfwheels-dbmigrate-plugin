@@ -30,7 +30,7 @@
 	<cfscript>
 	var loc = {};
 	loc.info = $dbinfo(type="version",datasource=application.wheels.dataSourceName,username=application.wheels.dataSourceUserName,password=application.wheels.dataSourcePassword);
-	if (loc.info.driver_name Contains "SQLServer" || loc.info.driver_name Contains "Microsoft SQL Server")
+	if (loc.info.driver_name Contains "SQLServer" || loc.info.driver_name Contains "Microsoft SQL Server" || loc.info.driver_name Contains "MS SQL Server" || loc.info.database_productname Contains "Microsoft SQL Server")
 		loc.adapterName = "MicrosoftSQLServer";
 	else if (loc.info.driver_name Contains "MySQL")
 		loc.adapterName = "MySQL";

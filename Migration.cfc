@@ -213,7 +213,13 @@
 				}
 			}
 			if(loc.columnNames != '') {
+				if(ListContainsNoCase(loc.columnnames, "[id]")) {
+					$execute(this.adapter.addRecordPrefix(arguments.table));
+				}
 				$execute("INSERT INTO #this.adapter.quoteTableName(LCase(arguments.table))# ( #loc.columnNames# ) VALUES ( #loc.columnValues# )");
+				if(ListContainsNoCase(loc.columnnames, "[id]")) {
+					$execute(this.adapter.addRecordSuffix(arguments.table));
+				}
 				announce("Added record to table #arguments.table#");
 			}
 		</cfscript>

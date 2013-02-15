@@ -1,6 +1,7 @@
 <cfcomponent extends="Abstract">
 
 	<cfset variables.sqlTypes = {}>
+	<cfset variables.sqlTypes['primaryKey'] = "int NOT NULL IDENTITY (1, 1)">
 	<cfset variables.sqlTypes['binary'] = {name='IMAGE'}>
 	<cfset variables.sqlTypes['boolean'] = {name='BIT'}>
 	<cfset variables.sqlTypes['date'] = {name='DATETIME'}>
@@ -34,25 +35,25 @@
 		<cfreturn arguments.sql>
 	</cffunction>
     
-    <cffunction name="primaryKeyConstraint" returntype="string" access="public">
-    	<cfargument name="name" type="string" required="true">
-        <cfargument name="primaryKeys" type="array" required="true">
-        <cfscript>
-        var loc = {};
-		
-		loc.sql = "CONSTRAINT [PK_#arguments.name#] PRIMARY KEY CLUSTERED (";
-		
-		for (loc.i = 1; loc.i lte ArrayLen(arguments.primaryKeys); loc.i++)
-		{
-			if (loc.i != 1) 
-				loc.sql = loc.sql & ", "; 
-			loc.sql = loc.sql & arguments.primaryKeys[loc.i].toColumnNameSQL() & " ASC";
-		}
-		
-		loc.sql = loc.sql & ")"; 
-        </cfscript>
-        <cfreturn loc.sql />
-    </cffunction>
+  <cffunction name="primaryKeyConstraint" returntype="string" access="public">
+  	<cfargument name="name" type="string" required="true">
+      <cfargument name="primaryKeys" type="array" required="true">
+      <cfscript>
+      var loc = {};
+	
+	loc.sql = "CONSTRAINT [PK_#arguments.name#] PRIMARY KEY CLUSTERED (";
+	
+	for (loc.i = 1; loc.i lte ArrayLen(arguments.primaryKeys); loc.i++)
+	{
+		if (loc.i != 1) 
+			loc.sql = loc.sql & ", "; 
+		loc.sql = loc.sql & arguments.primaryKeys[loc.i].toColumnNameSQL() & " ASC";
+	}
+	
+	loc.sql = loc.sql & ")"; 
+      </cfscript>
+      <cfreturn loc.sql />
+  </cffunction>
 
 	<!---  SQL Server uses square brackets to escape table and column names --->
 	<cffunction name="quoteTableName" returntype="string" access="public" hint="surrounds table or index names with quotes">
@@ -139,9 +140,11 @@
 				AND column_name =
 					<cfqueryparam cfsqltype="cf_sql_varchar" value="#arguments.columnName#">
 		</cfquery>
-		<cfloop query="loc.constraints">
-			<cfset $execute("ALTER TABLE #quoteTableName(LCase(arguments.name))# DROP CONSTRAINT #loc.constraints.constraint#")>
-		</cfloop>
+		<cfif loc.constraints.RecordCount GT 0>
+			<cfloop query="loc.constraints">
+				<cfset $execute("ALTER TABLE #quoteTableName(LCase(arguments.name))# DROP CONSTRAINT #loc.constraints.constraint_name#")>
+			</cfloop>
+		</cfif>
 	</cffunction>
 
 	<cffunction name="$removeDefaultConstraint" access="private" hint="SQL Server: Removes default constraints on a given column.">
@@ -151,18 +154,20 @@
 		<cfquery name="loc.constraints" datasource="#application.wheels.dataSourceName#" username="#application.wheels.dataSourceUserName#" password="#application.wheels.dataSourcePassword#">
 			EXEC sp_helpconstraint #quoteTableName(LCase(arguments.name))#, 'nomsg'
 		</cfquery>
-		<cfquery name="loc.constraints" dbtype="query">
-			SELECT
-				*
-			FROM
-				[loc].[constraints]
-			WHERE
-				constraint_type =
-					<cfqueryparam cfsqltype="cf_sql_varchar" value="DEFAULT on column #arguments.columnName#">
-		</cfquery>
-		<cfloop query="loc.constraints">
-			<cfset $execute("ALTER TABLE #quoteTableName(LCase(arguments.name))# DROP CONSTRAINT #loc.constraints.constraint_name#")>
-		</cfloop>
+		<cfif StructKeyExists(loc, "constraints") And loc.constraints.RecordCount NEQ "" And loc.constraints.RecordCount GT 0>
+			<cfquery name="loc.constraints" dbtype="query">
+				SELECT
+					*
+				FROM
+					[loc].[constraints]
+				WHERE
+					constraint_type =
+						<cfqueryparam cfsqltype="cf_sql_varchar" value="DEFAULT on column #arguments.columnName#">
+			</cfquery>
+			<cfloop query="loc.constraints">
+				<cfset $execute("ALTER TABLE #quoteTableName(LCase(arguments.name))# DROP CONSTRAINT #loc.constraints.constraint_name#")>
+			</cfloop>
+		</cfif>
 	</cffunction>
 
 	<cffunction name="$removeIndexes" access="private" hint="SQL Server: Removes all indexes on a given column.">
@@ -194,6 +199,58 @@
 		<cfloop query="loc.indexes">
 			<cfset $execute(removeIndex(arguments.name, loc.indexes.index_name))>
 		</cfloop>
+	</cffunction>
+
+	<cffunction name="typeToSQL" returntype="string">
+		<cfargument name="type" type="string" required="true" hint="column type">
+		<cfargument name="options" type="struct" required="false" default="#StructNew()#" hint="column options">
+		<cfscript>
+		var sql = '';
+		if(IsDefined("variables.sqlTypes") && structKeyExists(variables.sqlTypes,arguments.type)) {
+			if(IsStruct(variables.sqlTypes[arguments.type])) {
+				sql = variables.sqlTypes[arguments.type]['name'];
+				if(arguments.type == 'decimal') {
+					if(!StructKeyExists(arguments.options,'precision') && StructKeyExists(variables.sqlTypes[arguments.type],'precision')) {
+						arguments.options.precision = variables.sqlTypes[arguments.type]['precision'];
+					}
+					if(!StructKeyExists(arguments.options,'scale') && StructKeyExists(variables.sqlTypes[arguments.type],'scale')) {
+						arguments.options.scale = variables.sqlTypes[arguments.type]['scale'];
+					}
+					if(StructKeyExists(arguments.options,'precision')) {
+						if(StructKeyExists(arguments.options,'scale')) {
+							sql = sql & '(#arguments.options.precision#,#arguments.options.scale#)';
+						} else {
+							sql = sql & '(#arguments.options.precision#)';
+						}
+					}
+				} else if(arguments.type == 'integer') {
+					if(StructKeyExists(arguments.options,'limit')) {
+						sql = sql;
+					}
+				} else {
+					if(!StructKeyExists(arguments.options,'limit') && StructKeyExists(variables.sqlTypes[arguments.type],'limit')) {
+						arguments.options.limit = variables.sqlTypes[arguments.type]['limit'];
+					}
+					if(StructKeyExists(arguments.options,'limit')) {
+						sql = sql & '(#arguments.options.limit#)';
+					}
+				}
+			} else {
+				sql = variables.sqlTypes[arguments.type];
+			}
+		}
+		</cfscript>
+		<cfreturn sql>
+	</cffunction>
+
+	<cffunction name="addRecordPrefix" returntype="string" access="public" hint="prepends sql server identity_insert on to allow inserting primary key values">
+		<cfargument name="table" type="string" required="true" hint="table name">
+		<cfreturn "SET IDENTITY_INSERT #quoteTableName(LCase(arguments.table))# ON">
+	</cffunction>
+
+	<cffunction name="addRecordSuffix" returntype="string" access="public" hint="appends sql server identity_insert on to disallow inserting primary key values">
+		<cfargument name="table" type="string" required="true" hint="table name">
+		<cfreturn "SET IDENTITY_INSERT #quoteTableName(LCase(arguments.table))# OFF">
 	</cffunction>
 
 </cfcomponent>
