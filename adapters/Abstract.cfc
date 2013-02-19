@@ -84,9 +84,10 @@
 				}
 			}
 
-			if (structKeyExists(arguments.options, "afterColumn"))
-				arguments.sql = arguments.sql & " AFTER #arguments.options.afterColumn#";
 		</cfscript>
+		<cfif structKeyExists(arguments.options, "afterColumn") And Len(Trim(arguments.options.afterColumn)) GT 0>
+			<cfset arguments.sql = arguments.sql & " AFTER #arguments.options.afterColumn#">
+		</cfif>
 		<cfreturn arguments.sql>
 	</cffunction>
 	
