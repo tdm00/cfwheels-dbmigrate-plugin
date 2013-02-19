@@ -2,25 +2,25 @@
 
 	<cffunction name="init" returntype="Migration" access="public">
 		<cfscript>
-		var dbType = $getDBType();
-		if(dbType == '') {
-			$throw(type="Plugins.dbmigrate.DatabaseNotSupported", message="#dbType# is not supported by DBMigrate plugin.", extendedInfo="Use Microsoft SQL Server, MySQL, Oracle, SQLite or PostgreSQL.");
-		} else {
-			this.adapter = CreateObject("component","adapters.#dbType#");
-		}
+			var dbType = $getDBType();
+			if(dbType == '') {
+				$throw(type="Plugins.dbmigrate.DatabaseNotSupported", message="#dbType# is not supported by DBMigrate plugin.", extendedInfo="Use Microsoft SQL Server, MySQL, Oracle, SQLite or PostgreSQL.");
+			} else {
+				this.adapter = CreateObject("component","adapters.#dbType#");
+			}
 		</cfscript>
 		<cfreturn this>
 	</cffunction>
 
 	<cffunction name="up" returntype="void" access="public" hint="migrates up">
 		<cfscript>
-		announce("UP MIGRATION NOT IMPLEMENTED");
+			announce("UP MIGRATION NOT IMPLEMENTED");
 		</cfscript>
 	</cffunction>
 	
 	<cffunction name="down" returntype="void" access="public" hint="migrates down">
 		<cfscript>
-		announce("DOWN MIGRATION NOT IMPLEMENTED");
+			announce("DOWN MIGRATION NOT IMPLEMENTED");
 		</cfscript>
 	</cffunction>
 	
@@ -30,7 +30,7 @@
 		<cfargument name="id" type="boolean" required="false" default="true" hint="if false, defines a table with no primary key">
 		<cfargument name="primaryKey" type="string" required="false" default="id" hint="overrides default primary key name">
 		<cfscript>
-		arguments.adapter = this.adapter;
+			arguments.adapter = this.adapter;
 		</cfscript>
 		<cfreturn CreateObject("component","TableDefinition").init(argumentCollection=arguments)>
 	</cffunction>
@@ -44,8 +44,8 @@
 		<cfargument name="oldName" type="string" required="true" hint="existing table name">
 		<cfargument name="newName" type="string" required="true" hint="new table name">
 		<cfscript>
-		$execute(this.adapter.renameTable(argumentCollection=arguments));
-		announce("Renamed table #arguments.oldName# to #arguments.newName#");
+			$execute(this.adapter.renameTable(argumentCollection=arguments));
+			announce("Renamed table #arguments.oldName# to #arguments.newName#");
 		</cfscript>
 	</cffunction>
 
@@ -62,8 +62,8 @@
     			dropForeignKey(table=arguments.name,keyname=loc.foreignKeyName);
     		}
     	}
-    $execute(this.adapter.dropTable(name=arguments.name));
-    announce("Dropped table #arguments.name#");
+	    $execute(this.adapter.dropTable(name=arguments.name));
+	    announce("Dropped table #arguments.name#");
 		</cfscript>
 	</cffunction>
 	
@@ -79,8 +79,8 @@
 		<cfargument name="precision" type="numeric" required="false" hint="number of digits the column can hold">
 		<cfargument name="scale" type="numeric" required="false" hint="number of digits that can be placed to the right of the decimal point (must be less than or equal to precision)">
 		<cfscript>
-		arguments.addColumns = true;
-		changeColumn(argumentCollection=arguments);
+			arguments.addColumns = true;
+			changeColumn(argumentCollection=arguments);
 		</cfscript>
 	</cffunction>
 
@@ -97,15 +97,15 @@
 		<cfargument name="scale" type="numeric" required="false" hint="number of digits that can be placed to the right of the decimal point (must be less than or equal to precision)">
 		<cfargument name="addColumns" type="boolean" required="false" default="false" hint="whether to add new columns or change existing columns">
 		<cfscript>
-		var t = changeTable(arguments.table);
-		if(arguments.columnType == "reference") {
-			arguments.columnType = "references";
-			arguments.referenceNames = arguments.referenceName;
-		} else {
-			arguments.columnNames = arguments.columnName;
-		}
-		Evaluate("t.#arguments.columnType#(argumentCollection=arguments)");
-		t.change(addColumns=arguments.addColumns);
+			var t = changeTable(arguments.table);
+			if(arguments.columnType == "reference") {
+				arguments.columnType = "references";
+				arguments.referenceNames = arguments.referenceName;
+			} else {
+				arguments.columnNames = arguments.columnName;
+			}
+			Evaluate("t.#arguments.columnType#(argumentCollection=arguments)");
+			t.change(addColumns=arguments.addColumns);
 		</cfscript>
 	</cffunction>
 	
@@ -114,8 +114,8 @@
 		<cfargument name="columnName" type="string" required="true" hint="old column name">
 		<cfargument name="newColumnName" type="string" required="true" hint="new column name">
 		<cfscript>
-		$execute(this.adapter.renameColumnInTable(name=arguments.table,columnName=arguments.columnName,newColumnName=arguments.newColumnName));
-		announce("Renamed column #arguments.columnName# to #arguments.newColumnName# in table #arguments.table#");
+			$execute(this.adapter.renameColumnInTable(name=arguments.table,columnName=arguments.columnName,newColumnName=arguments.newColumnName));
+			announce("Renamed column #arguments.columnName# to #arguments.newColumnName# in table #arguments.table#");
 		</cfscript>
 	</cffunction>
 	
@@ -124,11 +124,11 @@
 		<cfargument name="columnName" type="string" required="false" default="" hint="column name to remove">
 		<cfargument name="referenceName" type="string" required="false" default="" hint="reference to column to remove">
 		<cfscript>
-		if(arguments.referenceName != "") {
-			arguments.columnName = arguments.referenceName & "id";
-		}
-		$execute(this.adapter.dropColumnFromTable(name=arguments.table,columnName=arguments.columnName));
-		announce("Removed column #arguments.columnName# from #arguments.table#");
+			if(arguments.referenceName != "") {
+				arguments.columnName = arguments.referenceName & "id";
+			}
+			$execute(this.adapter.dropColumnFromTable(name=arguments.table,columnName=arguments.columnName));
+			announce("Removed column #arguments.columnName# from #arguments.table#");
 		</cfscript>
 	</cffunction>
 	
@@ -136,7 +136,7 @@
 		<cfargument name="table" type="string" required="true" hint="table name">
 		<cfargument name="referenceName" type="string" required="true" hint="reference name that was provided to table.reference()">
 		<cfscript>
-		addForeignKey(table=arguments.table, referenceTable=pluralize(arguments.referenceName), column="#arguments.referenceName#id", referenceColumn="id");
+			addForeignKey(table=arguments.table, referenceTable=pluralize(arguments.referenceName), column="#arguments.referenceName#id", referenceColumn="id");
 		</cfscript>
 	</cffunction>
 	
@@ -146,9 +146,9 @@
 		<cfargument name="column" type="string" required="true" hint="column name">
 		<cfargument name="referenceColumn" type="string" required="true" hint="reference column name">
 		<cfscript>
-		var foreignKey = CreateObject("component","ForeignKeyDefinition").init(adapter=this.adapter, argumentCollection=arguments);
-		$execute(this.adapter.addForeignKeyToTable(name=arguments.table, foreignKey=foreignKey));
-		announce("Added foreign key #foreignKey.name#");
+			var foreignKey = CreateObject("component","ForeignKeyDefinition").init(adapter=this.adapter, argumentCollection=arguments);
+			$execute(this.adapter.addForeignKeyToTable(name=arguments.table, foreignKey=foreignKey));
+			announce("Added foreign key #foreignKey.name#");
 		</cfscript>
 	</cffunction>
 
@@ -156,7 +156,7 @@
 		<cfargument name="table" type="string" required="true" hint="table name">
 		<cfargument name="referenceName" type="string" required="true" hint="reference name that was provided to table.reference()">
 		<cfscript>
-		dropForeignKey(arguments.table,"FK_#arguments.table#_#pluralize(arguments.referenceName)#");
+			dropForeignKey(arguments.table,"FK_#arguments.table#_#pluralize(arguments.referenceName)#");
 		</cfscript>
 	</cffunction>
 	
@@ -164,8 +164,8 @@
 		<cfargument name="table" type="string" required="true" hint="table name">
 		<cfargument name="keyName" type="string" required="true" hint="foreign key name">
 		<cfscript>
-		$execute(this.adapter.dropForeignKeyFromTable(name=arguments.table,keyName=arguments.keyName));
-		announce("Dropped foreign key #arguments.keyName#");
+			$execute(this.adapter.dropForeignKeyFromTable(name=arguments.table,keyName=arguments.keyName));
+			announce("Dropped foreign key #arguments.keyName#");
 		</cfscript>
 	</cffunction>
 
@@ -175,8 +175,8 @@
 		<cfargument name="unique" type="boolean" required="false" default="false" hint="create unique index">
 		<cfargument name="indexName" type="string" required="false" default="#LCase(arguments.table)#_#ListFirst(arguments.columnNames)#" hint="override the default index name">
 		<cfscript>
-		$execute(this.adapter.addIndex(argumentCollection=arguments));
-		announce("Added index to column(s) #arguments.columnNames# in table #arguments.table#");
+			$execute(this.adapter.addIndex(argumentCollection=arguments));
+			announce("Added index to column(s) #arguments.columnNames# in table #arguments.table#");
 		</cfscript>
 	</cffunction>
 	
@@ -184,16 +184,16 @@
 		<cfargument name="table" type="string" required="true" hint="table name">
 		<cfargument name="indexName" type="string" required="true" hint="index name">
 		<cfscript>
-		$execute(this.adapter.removeIndex(argumentCollection=arguments));
-		announce("Removed index #arguments.indexName# from table #arguments.table#");
+			$execute(this.adapter.removeIndex(argumentCollection=arguments));
+			announce("Removed index #arguments.indexName# from table #arguments.table#");
 		</cfscript>
 	</cffunction>
 
 	<cffunction name="execute" returntype="void" access="public" hint="executes a raw sql query">
 		<cfargument name="sql" type="string" required="true">
 		<cfscript>
-		$execute(arguments.sql);
-		announce("Executed SQL: #arguments.sql#");
+			$execute(arguments.sql);
+			announce("Executed SQL: #arguments.sql#");
 		</cfscript>
 	</cffunction>
 
@@ -234,33 +234,33 @@
 		<cfargument name="table" type="string" required="true" hint="table name">
 		<cfargument name="where" type="string" required="false" default="" hint="where condition">
 		<cfscript>
-		var loc = {};
-		loc.columnUpdates = "";
-		for (loc.key in arguments) {
-			if(loc.key neq "table" && loc.key neq "where") {
-				loc.update = "#this.adapter.quoteColumnName(loc.key)# = ";
-				if(IsNumeric(arguments[loc.key])) {
-					loc.update = loc.update & "#arguments[loc.key]#";
-				} else if(IsBoolean(arguments[loc.key])) {
-					loc.update = loc.update & "#IIf(arguments[loc.key],1,0)#";
-				} else if(IsDate(arguments[loc.key])) {
-					loc.update = loc.update & "#arguments[loc.key]#";
-				} else {
-					loc.update = loc.update & "'#arguments[loc.key]#'";
+			var loc = {};
+			loc.columnUpdates = "";
+			for (loc.key in arguments) {
+				if(loc.key neq "table" && loc.key neq "where") {
+					loc.update = "#this.adapter.quoteColumnName(loc.key)# = ";
+					if(IsNumeric(arguments[loc.key])) {
+						loc.update = loc.update & "#arguments[loc.key]#";
+					} else if(IsBoolean(arguments[loc.key])) {
+						loc.update = loc.update & "#IIf(arguments[loc.key],1,0)#";
+					} else if(IsDate(arguments[loc.key])) {
+						loc.update = loc.update & "#arguments[loc.key]#";
+					} else {
+						loc.update = loc.update & "'#arguments[loc.key]#'";
+					}
+					loc.columnUpdates = ListAppend(loc.columnUpdates,loc.update);
 				}
-				loc.columnUpdates = ListAppend(loc.columnUpdates,loc.update);
 			}
-		}
-		if(loc.columnUpdates != '') {
-			loc.sql = 'UPDATE #this.adapter.quoteTableName(LCase(arguments.table))# SET #loc.columnUpdates#';
-			loc.message = 'Updated record(s) in table #arguments.table#';
-			if(arguments.where != '') {
-				loc.sql = loc.sql & ' WHERE #arguments.where#';
-				loc.message = loc.message & ' where #arguments.where#';
+			if(loc.columnUpdates != '') {
+				loc.sql = 'UPDATE #this.adapter.quoteTableName(LCase(arguments.table))# SET #loc.columnUpdates#';
+				loc.message = 'Updated record(s) in table #arguments.table#';
+				if(arguments.where != '') {
+					loc.sql = loc.sql & ' WHERE #arguments.where#';
+					loc.message = loc.message & ' where #arguments.where#';
+				}
+				$execute(loc.sql);
+				announce(loc.message);
 			}
-			$execute(loc.sql);
-			announce(loc.message);
-		}
 		</cfscript>
 	</cffunction>
 
@@ -268,15 +268,15 @@
 		<cfargument name="table" type="string" required="true" hint="table name">
 		<cfargument name="where" type="string" required="false" default="" hint="where condition">
 		<cfscript>
-		var loc = {};
-		loc.sql = 'DELETE FROM #this.adapter.quoteTableName(LCase(arguments.table))#';
-		loc.message = 'Removed record(s) from table #arguments.table#';
-		if(arguments.where != '') {
-			loc.sql = loc.sql & ' WHERE #arguments.where#';
-			loc.message = loc.message & ' where #arguments.where#';
-		}
-		$execute(loc.sql);
-		announce(loc.message);
+			var loc = {};
+			loc.sql = 'DELETE FROM #this.adapter.quoteTableName(LCase(arguments.table))#';
+			loc.message = 'Removed record(s) from table #arguments.table#';
+			if(arguments.where != '') {
+				loc.sql = loc.sql & ' WHERE #arguments.where#';
+				loc.message = loc.message & ' where #arguments.where#';
+			}
+			$execute(loc.sql);
+			announce(loc.message);
 		</cfscript>
 	</cffunction>
 
