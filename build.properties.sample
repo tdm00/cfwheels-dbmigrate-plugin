@@ -1,6 +1,0 @@
-<!-- Create a variable for the version of the plugin to build -->
-plugin.version=0.0.0
-
-<!-- Directory to place the ZIP archive after build -->
-cfwheels.plugindir=
-
