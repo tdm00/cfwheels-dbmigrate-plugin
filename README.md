@@ -42,6 +42,7 @@ Just want to acknowledge, and thanks, everyone that's helped with this plugin.  
 * Tom Hoen
 * Adam Michel
 * James Gibson
+* Samson Quaye
 * Everyone who has submitted bugs on the issue tracker
 
 ## License
