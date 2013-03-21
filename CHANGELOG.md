@@ -8,8 +8,19 @@
   * Enhancement: Expose more functionality around primary keys to be able to model real world databases. This includes being able to specify primary keys that also have foreign key references and creating a table with multiple primary keys.
   * Fixed: Removed an argument for addColumnOptions in adapters/Abstract.cfc that was no longer needed.
   * Enhancement: Updated the TableDefinitions.cfc methods to allow chaining to have a bit cleaner code in the migrations.
-  * Fixed a bug on some CFML engines where WDDX function conflicts with existing function in variables scope
-  * Improve the detection of SQL Server database connections
+  * Fixed: a bug on some CFML engines where WDDX function conflicts with existing function in variables scope
+  * Enhancement: the detection of SQL Server database connections
+  * Fixed: a bug with with the addColumnOptions function testing for the afterColumn key
+  * New: Added CONTRIBUTING file with instructions for contributing
+  * Enhancement: add ability to use real timestamp field for database instead of date/time field
+  * Fix: MySQL text and float column types ignore a default value if passed in
+  * Fix: spelling error that caused a problem when dropping some tables
+  * Enhancement: redesign the plugin interface using Zurb Foundation
+  * Fix: will ignore if $WDDX function already exists in memory rather then throwing an error
+  * Enhancement: Remove reliance on $file method
+  * Enhancement: Compatibility with CFWheels 1.1.8 and 1.2 beta
+  * Fix: correct a problem when removing a column with SQL Server when no constraints existed
+  * Enhancement: correct a problem where inserting a new record in SQL Server that specified a primary key would fail.
   
 
 * 0.9.0
