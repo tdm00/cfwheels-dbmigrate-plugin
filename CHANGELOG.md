@@ -1,6 +1,10 @@
 # Changelog
 
 * 1.0.0
+  * Fixed: String values with more then one single quote aren't being escaped in generated SQL for updateRecord  - [https://github.com/tdm00/cfwheels-dbmigrate-plugin/issues/73](https://github.com/tdm00/cfwheels-dbmigrate-plugin/issues/73)
+
+
+* 1.0.0
   * Misc: Change plugin version numbering to match Semantic Versioning (http://semver.org/)
   * New: Added request timeout variable value of 999999 when submitting migrations to help prevent timeouts
   * Fixed: dropColumnFromTable() in SQL Server was throwing an exception when there was a DEFAULT value set for the column (which ends up being a `CONSTRAINT` in SQL Server)
@@ -27,12 +31,15 @@
   * Fixed: Simple syntax error in Migration.cfc was causing the createObjectFromRoot to throw an exception. Fixed syntax error and migrations work again.  - [https://github.com/tdm00/cfwheels-dbmigrate-plugin/issues/41](https://github.com/tdm00/cfwheels-dbmigrate-plugin/issues/41)
   * Fixed: String values with more then one single quote aren't being escaped in generated SQL  - [https://github.com/tdm00/cfwheels-dbmigrate-plugin/issues/42](https://github.com/tdm00/cfwheels-dbmigrate-plugin/issues/42)
 
+
 * 0.8.2
   * Fixed: updateRecord incorrectly adds single quotes to date values - [https://github.com/tdm00/cfwheels-dbmigrate-plugin/issues/39](https://github.com/tdm00/cfwheels-dbmigrate-plugin/issues/39)
+
 
 * 0.8.1
   * Fixed: When generating SQL INSERT code with values that use an apostrophe or single quote, these values are escaped properly - [https://github.com/tdm00/cfwheels-dbmigrate-plugin/issues/36](https://github.com/tdm00/cfwheels-dbmigrate-plugin/issues/36)
   * Update compatibility for ColdFusion on Wheels framework 1.1.6 - [https://github.com/tdm00/cfwheels-dbmigrate-plugin/issues/38](https://github.com/tdm00/cfwheels-dbmigrate-plugin/issues/38)
+
 
 * 0.8.0
   * New: Add Oracle code specific block to basefunctions.cfm - [code changes from Raúl Riera](https://github.com/tdm00/cfwheels-dbmigrate-plugin/issues/27)
@@ -43,12 +50,15 @@
   * New: Add [plugin version number](https://github.com/tdm00/cfwheels-dbmigrate-plugin/issues/31) to plugin page
   * Resolve [issue #6](https://github.com/tdm00/cfwheels-dbmigrate-plugin/issues/6) when using renameColumn() with MySQL
   
+
 * 0.7.2
   * Update README.md with renamed project URL's
   * Create CHANGELOG.md file
 
+
 * 0.7.1
   * Fixed: Renamed references to DBMigrate to be dbmigrate to resolve a problem with case-sensitive file-systems, such as *nix
+
 
 * 0.7.0
   * Update plugin compatibility for CFWheels 1.1.3, 1.1.4 and 1.1.5
@@ -66,12 +76,15 @@
   * Create create-table template that includes parameters table and example code
   * Fix problem with MySQL statements for inserting values into date/time fields
 
+
 * 0.6.0
   * N/A
   
+
 * 0.5.0
   * N/A  
   
+
 * 0.4.0
   * Fixed issues with descriptions and filenaming when creating migrations from templates - Issue 1
   * references() and timestamps() now use lowercase column names to fit with cfwheels recommended conventions - Issue 2
@@ -80,13 +93,16 @@
   * Timestamp bug fixed for 24 hour time - Issue 6
   * Removed cftransaction wrapper - alternate version provided (more info)
 
+
 * 0.3 Migration Tracking
   * Fixed migration version tracking so you can run all non-migrated versions
   * SQL Server and Oracle adapter updates
   * Access to Wheels model() function within migrations
 
+
 * 0.2 Migration Templates Update
   * Added functionality to plugin page to create migrations from templates
+
 
 * 0.1 Initial Release
   * Initial Release for feedback and suggestions
