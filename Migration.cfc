@@ -246,6 +246,7 @@
 					} else if(IsDate(arguments[loc.key])) {
 						loc.update = loc.update & "#arguments[loc.key]#";
 					} else {
+						arguments[loc.key] = ReplaceNoCase(arguments[loc.key], "'", "''", "all");
 						loc.update = loc.update & "'#arguments[loc.key]#'";
 					}
 					loc.columnUpdates = ListAppend(loc.columnUpdates,loc.update);
