@@ -251,8 +251,7 @@
 		loc.identityCol = "";
 		loc.iEnd = loc.columns.RecordCount;
 		for (loc.i=1; loc.i <= loc.iEnd; loc.i++) {
-			if( listFindNoCase( "identity", loc.columns["TYPE_NAME"][loc.i], " " )
-			{
+			if( listFindNoCase( loc.columns["TYPE_NAME"][loc.i], "identity", " " ) ) {
 				loc.identityCol = listAppend( loc.identityCol, loc.columns["COLUMN_NAME"][loc.i] );
 				break;
 			}
@@ -267,14 +266,14 @@
 		<cfargument name="values" type="struct" required="true" hint="struct of column names and values">
 		<cfscript>
 			var loc = {};
-			loc.sql = super.addRecord( arguments.table, arguments.value );
+			loc.sql = super.addRecord( arguments.table, arguments.values );
 			loc.identityCol= $getIdentityColumn( arguments.table );
 			
 			// if trying to insert into an identity column wrap it with IDENTITY_INSERT ON/OFF
 			if( len( loc.identityCol ) AND listFindNoCase( structKeyList( arguments.values ), loc.identityCol ) ) {
-				loc.sql = "SET IDENTITY_INSERT #quoteTableName(LCase(arguments.table))# ON;"
-						& loc.sql & ";"
-						& "SET IDENTITY_INSERT #quoteTableName(LCase(arguments.table))# OFF;"
+				loc.sql = "SET IDENTITY_INSERT #quoteTableName(LCase(arguments.table))# ON;" & chr(10)
+						& loc.sql & ";" & chr(10)
+						& "SET IDENTITY_INSERT #quoteTableName(LCase(arguments.table))# OFF;" & chr(10)
 			}
 		</cfscript>
 		<cfreturn loc.sql>

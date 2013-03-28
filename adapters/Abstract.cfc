@@ -289,17 +289,16 @@
 			loc.sql = "";
 			loc.columnNames = "";
 			loc.columnValues = "";
-			for (loc.key in arguments) {
-					loc.columnNames = ListAppend(loc.columnNames,this.adapter.quoteColumnName(loc.key));
-					if(IsNumeric(arguments[loc.key])) {
-						loc.columnValues = ListAppend(loc.columnValues,arguments[loc.key]);
-					} else if(IsBoolean(arguments[loc.key])) {
-						loc.columnValues = ListAppend(loc.columnValues,IIf(arguments[loc.key],1,0));
-					} else if(IsDate(arguments[loc.key])) {
-						loc.columnValues = ListAppend(loc.columnValues,arguments[loc.key]);
-					} else {
-						loc.columnValues = ListAppend(loc.columnValues,"'#ReplaceNoCase(arguments[loc.key],"'","''","all")#'");
-					}
+			for (loc.key in arguments.values) {
+				loc.columnNames = ListAppend(loc.columnNames,quoteColumnName(loc.key));
+				if(IsNumeric(arguments.values[loc.key])) {
+					loc.columnValues = ListAppend(loc.columnValues,arguments.values[loc.key]);
+				} else if(IsBoolean(arguments.values[loc.key])) {
+					loc.columnValues = ListAppend(loc.columnValues,IIf(arguments.values[loc.key],1,0));
+				} else if(IsDate(arguments.values[loc.key])) {
+					loc.columnValues = ListAppend(loc.columnValues,arguments.values[loc.key]);
+				} else {
+					loc.columnValues = ListAppend(loc.columnValues,"'#ReplaceNoCase(arguments.values[loc.key],"'","''","all")#'");
 				}
 			}
 			loc.sql = "INSERT INTO #quoteTableName(LCase(arguments.table))# ( #loc.columnNames# ) VALUES ( #loc.columnValues# )";
