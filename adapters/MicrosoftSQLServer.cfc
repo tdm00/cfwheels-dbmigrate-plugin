@@ -242,15 +242,43 @@
 		</cfscript>
 		<cfreturn sql>
 	</cffunction>
-
-	<cffunction name="addRecordPrefix" returntype="string" access="public" hint="prepends sql server identity_insert on to allow inserting primary key values">
-		<cfargument name="table" type="string" required="true" hint="table name">
-		<cfreturn "SET IDENTITY_INSERT #quoteTableName(LCase(arguments.table))# ON">
+	
+	<cffunction name="$getIdentityColumn" returntype="string" access="private">
+		<cfargument name="tableName" type="string" required="yes" hint="table name">
+		<cfscript>
+		loc = {};
+	  	loc.columns = $dbinfo(type="columns",table=arguments.tableName,datasource=application.wheels.dataSourceName,username=application.wheels.dataSourceUserName,password=application.wheels.dataSourcePassword);
+		loc.identityCol = "";
+		loc.iEnd = loc.columns.RecordCount;
+		for (loc.i=1; loc.i <= loc.iEnd; loc.i++) {
+			if( listFindNoCase( "identity", loc.columns["TYPE_NAME"][loc.i], " " )
+			{
+				loc.identityCol = listAppend( loc.identityCol, loc.columns["COLUMN_NAME"][loc.i] );
+				break;
+			}
+		}
+		</cfscript>
+		<cfreturn loc.identityCol>
 	</cffunction>
 
-	<cffunction name="addRecordSuffix" returntype="string" access="public" hint="appends sql server identity_insert on to disallow inserting primary key values">
+
+	<cffunction name="addRecord" returntype="string" access="public" hint="adds a record to a table">
 		<cfargument name="table" type="string" required="true" hint="table name">
-		<cfreturn "SET IDENTITY_INSERT #quoteTableName(LCase(arguments.table))# OFF">
+		<cfargument name="values" type="struct" required="true" hint="struct of column names and values">
+		<cfscript>
+			var loc = {};
+			loc.sql = super.addRecord( arguments.table, arguments.value );
+			loc.identityCol= $getIdentityColumn( arguments.table );
+			
+			// if trying to insert into an identity column wrap it with IDENTITY_INSERT ON/OFF
+			if( len( loc.identityCol ) AND listFindNoCase( structKeyList( arguments.values ), loc.identityCol ) ) {
+				loc.sql = "SET IDENTITY_INSERT #quoteTableName(LCase(arguments.table))# ON;"
+						& loc.sql & ";"
+						& "SET IDENTITY_INSERT #quoteTableName(LCase(arguments.table))# OFF;"
+			}
+		</cfscript>
+		<cfreturn loc.sql>
 	</cffunction>
+
 
 </cfcomponent>
