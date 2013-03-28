@@ -280,13 +280,32 @@
 		<cfargument name="indexName" type="string" required="false" default="" hint="index name">
 		<cfreturn "DROP INDEX #quoteTableName(arguments.indexName)#">
 	</cffunction>
-
-	<cffunction name="addRecordPrefix" returntype="string" access="public" hint="generates sql to remove a database index">
-		<cfreturn "">
-	</cffunction>
-
-	<cffunction name="addRecordSuffix" returntype="string" access="public" hint="generates sql to remove a database index">
-		<cfreturn "">
+	
+	<cffunction name="addRecord" returntype="string" access="public" hint="adds a record to a table">
+		<cfargument name="table" type="string" required="true" hint="table name">
+		<cfargument name="values" type="struct" required="true" hint="struct of column names and values">
+		<cfscript>
+			var loc = {};
+			loc.sql = "";
+			loc.columnNames = "";
+			loc.columnValues = "";
+			for (loc.key in arguments) {
+					loc.columnNames = ListAppend(loc.columnNames,this.adapter.quoteColumnName(loc.key));
+					if(IsNumeric(arguments[loc.key])) {
+						loc.columnValues = ListAppend(loc.columnValues,arguments[loc.key]);
+					} else if(IsBoolean(arguments[loc.key])) {
+						loc.columnValues = ListAppend(loc.columnValues,IIf(arguments[loc.key],1,0));
+					} else if(IsDate(arguments[loc.key])) {
+						loc.columnValues = ListAppend(loc.columnValues,arguments[loc.key]);
+					} else {
+						loc.columnValues = ListAppend(loc.columnValues,"'#ReplaceNoCase(arguments[loc.key],"'","''","all")#'");
+					}
+				}
+			}
+			loc.sql = "INSERT INTO #quoteTableName(LCase(arguments.table))# ( #loc.columnNames# ) VALUES ( #loc.columnValues# )";
+		</cfscript>
+		
+		<cfreturn loc.sql>
 	</cffunction>
 
 </cfcomponent>
