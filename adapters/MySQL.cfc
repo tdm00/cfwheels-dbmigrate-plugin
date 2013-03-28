@@ -1,7 +1,6 @@
 <cfcomponent extends="Abstract">
 
 	<cfset variables.sqlTypes = {}>
-	<cfset variables.sqlTypes['biginteger'] = {name='BIGINT UNSIGNED'}>
 	<cfset variables.sqlTypes['binary'] = {name='BLOB'}>
 	<cfset variables.sqlTypes['boolean'] = {name='TINYINT',limit=1}>
 	<cfset variables.sqlTypes['date'] = {name='DATE'}>
@@ -14,6 +13,7 @@
 	<cfset variables.sqlTypes['time'] = {name='TIME'}>
 	<cfset variables.sqlTypes['timestamp'] = {name='TIMESTAMP'}>
 	<cfset variables.sqlTypes['uuid'] = {name='VARBINARY', limit=16}>
+	<cfset variables.sqlTypes['money'] = {name='DECIMAL',precision=19,scale=4}>
 
 	<cffunction name="adapterName" returntype="string" access="public" hint="name of database adapter">
 		<cfreturn "MySQL">
@@ -74,4 +74,38 @@
 		<cfreturn "DROP INDEX #quoteTableName(arguments.indexName)# ON #quoteTableName(arguments.table)#">
 	</cffunction>
 	
+	<cffunction name="typeToSQL" returntype="string">
+		<cfargument name="type" type="string" required="true" hint="column type">
+		<cfargument name="options" type="struct" required="false" default="#StructNew()#" hint="column options">
+		<cfscript>
+			var sql = super.typeToSQL( argumentCollection = arguments );
+			if(arguments.type == 'INTEGER' AND StructKeyExists(arguments.options,'limit') ) {
+				if(arguments.options.limit IS 'BIG') {
+					sql = 'BIGINT';
+				} else if(arguments.options.limit IS 'BIG UNSIGNED') {
+					sql = 'BIGINT UNSIGNED';
+				} else if(arguments.options.limit IS 'UNSIGNED') {
+					sql = 'INT UNSIGNED';
+				} else if(arguments.options.limit IS 'MEDIUM UNSIGNED') {
+					sql = 'MEDIUMINT UNSIGNED';
+				} else if(arguments.options.limit IS 'MEDIUM') {
+					sql = 'MEDIUMINT';
+				} else if(arguments.options.limit IS 'SMALL UNSIGNED') {
+					sql = 'SMALLINT UNSIGNED';
+				} else if(arguments.options.limit IS 'SMALL') {
+					sql = 'SMALLINT';
+				} else if(arguments.options.limit IS 'TINY UNSIGNED') {
+					sql = 'TINYINT UNSIGNED';
+				} else if(arguments.options.limit IS 'TINY') {
+					sql = 'TINYINT';
+				} else if(isNumeric(arguments.options.limit)){
+					sql = 'INT(#arguments.options.limit#)';
+				} else {
+					sql = 'INT';
+				}
+			}
+		</cfscript>
+		<cfreturn sql>
+	</cffunction>
+
 </cfcomponent>

@@ -4,7 +4,7 @@
 	<cfset variables.sqlTypes['primaryKey'] = "int NOT NULL IDENTITY (1, 1)">
 	<cfset variables.sqlTypes['binary'] = {name='IMAGE'}>
 	<cfset variables.sqlTypes['boolean'] = {name='BIT'}>
-	<cfset variables.sqlTypes['date'] = {name='DATETIME'}>
+	<cfset variables.sqlTypes['date'] = {name='DATE'}>
 	<cfset variables.sqlTypes['datetime'] = {name='DATETIME'}>
 	<cfset variables.sqlTypes['decimal'] = {name='DECIMAL'}>
 	<cfset variables.sqlTypes['float'] = {name='FLOAT'}>
@@ -13,6 +13,7 @@
 	<cfset variables.sqlTypes['text'] = {name='TEXT'}>
 	<cfset variables.sqlTypes['time'] = {name='DATETIME'}>
 	<cfset variables.sqlTypes['timestamp'] = {name='DATETIME'}>
+	<cfset variables.sqlTypes['money'] = {name='MONEY'}>
 
 	<cffunction name="adapterName" returntype="string" access="public" hint="name of database adapter">
 		<cfreturn "MicrosoftSQLServer">
@@ -205,40 +206,24 @@
 		<cfargument name="type" type="string" required="true" hint="column type">
 		<cfargument name="options" type="struct" required="false" default="#StructNew()#" hint="column options">
 		<cfscript>
-		var sql = '';
-		if(IsDefined("variables.sqlTypes") && structKeyExists(variables.sqlTypes,arguments.type)) {
-			if(IsStruct(variables.sqlTypes[arguments.type])) {
-				sql = variables.sqlTypes[arguments.type]['name'];
-				if(arguments.type == 'decimal') {
-					if(!StructKeyExists(arguments.options,'precision') && StructKeyExists(variables.sqlTypes[arguments.type],'precision')) {
-						arguments.options.precision = variables.sqlTypes[arguments.type]['precision'];
-					}
-					if(!StructKeyExists(arguments.options,'scale') && StructKeyExists(variables.sqlTypes[arguments.type],'scale')) {
-						arguments.options.scale = variables.sqlTypes[arguments.type]['scale'];
-					}
-					if(StructKeyExists(arguments.options,'precision')) {
-						if(StructKeyExists(arguments.options,'scale')) {
-							sql = sql & '(#arguments.options.precision#,#arguments.options.scale#)';
-						} else {
-							sql = sql & '(#arguments.options.precision#)';
-						}
-					}
-				} else if(arguments.type == 'integer') {
-					if(StructKeyExists(arguments.options,'limit')) {
-						sql = sql;
-					}
-				} else {
-					if(!StructKeyExists(arguments.options,'limit') && StructKeyExists(variables.sqlTypes[arguments.type],'limit')) {
-						arguments.options.limit = variables.sqlTypes[arguments.type]['limit'];
-					}
-					if(StructKeyExists(arguments.options,'limit')) {
-						sql = sql & '(#arguments.options.limit#)';
-					}
-				}
+			var sql = '';
+			if(arguments.type == 'DATETIME' AND StructKeyExists(arguments.options,'limit') AND arguments.options.limit IS 'SMALL') {
+				sql = 'SMALLDATETIME';
+			} else if(arguments.type == 'DATETIME' AND StructKeyExists(arguments.options,'limit') AND isNumeric( arguments.options.limit )) {
+				sql = 'DATETIME2(#arguments.limit#)';
+			} else if(arguments.type == 'MONEY' AND StructKeyExists(arguments.options,'limit') AND arguments.options.limit IS 'SMALL') {
+				sql = 'SMALLMONEY';
+			} else if(arguments.type == 'INTEGER' AND StructKeyExists(arguments.options,'limit') AND arguments.options.limit IS 'BIG') {
+				sql = 'BIGINT';
+			} else if(arguments.type == 'INTEGER' AND StructKeyExists(arguments.options,'limit') AND arguments.options.limit IS 'SMALL') {
+				sql = 'SMALLINT';
+			} else if(arguments.type == 'INTEGER' AND StructKeyExists(arguments.options,'limit') AND arguments.options.limit IS 'TINY') {
+				sql = 'TINYINT';
+			} else if(arguments.type == 'INTEGER' ) {
+				sql = 'INT';
 			} else {
-				sql = variables.sqlTypes[arguments.type];
+				sql = super.typeToSQL( argumentCollection = arguments );
 			}
-		}
 		</cfscript>
 		<cfreturn sql>
 	</cffunction>
@@ -273,7 +258,7 @@
 			if( len( loc.identityCol ) AND listFindNoCase( structKeyList( arguments.values ), loc.identityCol ) ) {
 				loc.sql = "SET IDENTITY_INSERT #quoteTableName(LCase(arguments.table))# ON;" & chr(10)
 						& loc.sql & ";" & chr(10)
-						& "SET IDENTITY_INSERT #quoteTableName(LCase(arguments.table))# OFF;" & chr(10)
+						& "SET IDENTITY_INSERT #quoteTableName(LCase(arguments.table))# OFF;" & chr(10);
 			}
 		</cfscript>
 		<cfreturn loc.sql>
@@ -281,3 +266,4 @@
 
 
 </cfcomponent>
+

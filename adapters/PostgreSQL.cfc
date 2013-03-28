@@ -12,6 +12,7 @@
 	<cfset variables.sqlTypes['text'] = {name='TEXT'}>
 	<cfset variables.sqlTypes['time'] = {name='TIME'}>
 	<cfset variables.sqlTypes['timestamp'] = {name='TIMESTAMP'}>
+	<cfset variables.sqlTypes['money'] = {name='DECIMAL',precision=19,scale=4}>
 
 	<cffunction name="adapterName" returntype="string" access="public" hint="name of database adapter">
 		<cfreturn "PostgreSQL">
