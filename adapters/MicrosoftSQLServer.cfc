@@ -4,7 +4,7 @@
 	<cfset variables.sqlTypes['primaryKey'] = "int NOT NULL IDENTITY (1, 1)">
 	<cfset variables.sqlTypes['binary'] = {name='IMAGE'}>
 	<cfset variables.sqlTypes['boolean'] = {name='BIT'}>
-	<cfset variables.sqlTypes['date'] = {name='DATETIME'}>
+	<cfset variables.sqlTypes['date'] = {name='DATE'}>
 	<cfset variables.sqlTypes['datetime'] = {name='DATETIME'}>
 	<cfset variables.sqlTypes['decimal'] = {name='DECIMAL'}>
 	<cfset variables.sqlTypes['float'] = {name='FLOAT'}>
@@ -13,6 +13,7 @@
 	<cfset variables.sqlTypes['text'] = {name='TEXT'}>
 	<cfset variables.sqlTypes['time'] = {name='DATETIME'}>
 	<cfset variables.sqlTypes['timestamp'] = {name='DATETIME'}>
+	<cfset variables.sqlTypes['money'] = {name='MONEY'}>
 
 	<cffunction name="adapterName" returntype="string" access="public" hint="name of database adapter">
 		<cfreturn "MicrosoftSQLServer">
@@ -205,52 +206,64 @@
 		<cfargument name="type" type="string" required="true" hint="column type">
 		<cfargument name="options" type="struct" required="false" default="#StructNew()#" hint="column options">
 		<cfscript>
-		var sql = '';
-		if(IsDefined("variables.sqlTypes") && structKeyExists(variables.sqlTypes,arguments.type)) {
-			if(IsStruct(variables.sqlTypes[arguments.type])) {
-				sql = variables.sqlTypes[arguments.type]['name'];
-				if(arguments.type == 'decimal') {
-					if(!StructKeyExists(arguments.options,'precision') && StructKeyExists(variables.sqlTypes[arguments.type],'precision')) {
-						arguments.options.precision = variables.sqlTypes[arguments.type]['precision'];
-					}
-					if(!StructKeyExists(arguments.options,'scale') && StructKeyExists(variables.sqlTypes[arguments.type],'scale')) {
-						arguments.options.scale = variables.sqlTypes[arguments.type]['scale'];
-					}
-					if(StructKeyExists(arguments.options,'precision')) {
-						if(StructKeyExists(arguments.options,'scale')) {
-							sql = sql & '(#arguments.options.precision#,#arguments.options.scale#)';
-						} else {
-							sql = sql & '(#arguments.options.precision#)';
-						}
-					}
-				} else if(arguments.type == 'integer') {
-					if(StructKeyExists(arguments.options,'limit')) {
-						sql = sql;
-					}
-				} else {
-					if(!StructKeyExists(arguments.options,'limit') && StructKeyExists(variables.sqlTypes[arguments.type],'limit')) {
-						arguments.options.limit = variables.sqlTypes[arguments.type]['limit'];
-					}
-					if(StructKeyExists(arguments.options,'limit')) {
-						sql = sql & '(#arguments.options.limit#)';
-					}
-				}
+			var sql = '';
+			if(arguments.type == 'DATETIME' AND StructKeyExists(arguments.options,'limit') AND arguments.options.limit IS 'SMALL') {
+				sql = 'SMALLDATETIME';
+			} else if(arguments.type == 'DATETIME' AND StructKeyExists(arguments.options,'limit') AND isNumeric( arguments.options.limit )) {
+				sql = 'DATETIME2(#arguments.limit#)';
+			} else if(arguments.type == 'MONEY' AND StructKeyExists(arguments.options,'limit') AND arguments.options.limit IS 'SMALL') {
+				sql = 'SMALLMONEY';
+			} else if(arguments.type == 'INTEGER' AND StructKeyExists(arguments.options,'limit') AND arguments.options.limit IS 'BIG') {
+				sql = 'BIGINT';
+			} else if(arguments.type == 'INTEGER' AND StructKeyExists(arguments.options,'limit') AND arguments.options.limit IS 'SMALL') {
+				sql = 'SMALLINT';
+			} else if(arguments.type == 'INTEGER' AND StructKeyExists(arguments.options,'limit') AND arguments.options.limit IS 'TINY') {
+				sql = 'TINYINT';
+			} else if(arguments.type == 'INTEGER' ) {
+				sql = 'INT';
 			} else {
-				sql = variables.sqlTypes[arguments.type];
+				sql = super.typeToSQL( argumentCollection = arguments );
 			}
-		}
 		</cfscript>
 		<cfreturn sql>
 	</cffunction>
-
-	<cffunction name="addRecordPrefix" returntype="string" access="public" hint="prepends sql server identity_insert on to allow inserting primary key values">
-		<cfargument name="table" type="string" required="true" hint="table name">
-		<cfreturn "SET IDENTITY_INSERT #quoteTableName(LCase(arguments.table))# ON">
+	
+	<cffunction name="$getIdentityColumn" returntype="string" access="private">
+		<cfargument name="tableName" type="string" required="yes" hint="table name">
+		<cfscript>
+		loc = {};
+	  	loc.columns = $dbinfo(type="columns",table=arguments.tableName,datasource=application.wheels.dataSourceName,username=application.wheels.dataSourceUserName,password=application.wheels.dataSourcePassword);
+		loc.identityCol = "";
+		loc.iEnd = loc.columns.RecordCount;
+		for (loc.i=1; loc.i <= loc.iEnd; loc.i++) {
+			if( listFindNoCase( loc.columns["TYPE_NAME"][loc.i], "identity", " " ) ) {
+				loc.identityCol = listAppend( loc.identityCol, loc.columns["COLUMN_NAME"][loc.i] );
+				break;
+			}
+		}
+		</cfscript>
+		<cfreturn loc.identityCol>
 	</cffunction>
 
-	<cffunction name="addRecordSuffix" returntype="string" access="public" hint="appends sql server identity_insert on to disallow inserting primary key values">
+
+	<cffunction name="addRecord" returntype="string" access="public" hint="adds a record to a table">
 		<cfargument name="table" type="string" required="true" hint="table name">
-		<cfreturn "SET IDENTITY_INSERT #quoteTableName(LCase(arguments.table))# OFF">
+		<cfargument name="values" type="struct" required="true" hint="struct of column names and values">
+		<cfscript>
+			var loc = {};
+			loc.sql = super.addRecord( arguments.table, arguments.values );
+			loc.identityCol= $getIdentityColumn( arguments.table );
+			
+			// if trying to insert into an identity column wrap it with IDENTITY_INSERT ON/OFF
+			if( len( loc.identityCol ) AND listFindNoCase( structKeyList( arguments.values ), loc.identityCol ) ) {
+				loc.sql = "SET IDENTITY_INSERT #quoteTableName(LCase(arguments.table))# ON;" & chr(10)
+						& loc.sql & ";" & chr(10)
+						& "SET IDENTITY_INSERT #quoteTableName(LCase(arguments.table))# OFF;" & chr(10);
+			}
+		</cfscript>
+		<cfreturn loc.sql>
 	</cffunction>
+
 
 </cfcomponent>
+

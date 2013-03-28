@@ -75,10 +75,9 @@
 <cffunction name="$getColumnDefinition" returntype="string" access="private">
 	<cfargument name="tableName" type="string" required="yes" hint="table name">
 	<cfargument name="columnName" type="string" required="yes" hint="column name">
-	<cfset var loc = {}>
-	<cfdbinfo name="loc.columns" type="columns" table="#arguments.tableName#" datasource="#application.wheels.dataSourceName#" username="#application.wheels.dataSourceUserName#" password="#application.wheels.dataSourcePassword#">
-    <!--- <cfdump var="#loc#" abort> --->
 	<cfscript>
+	loc = {};
+  	loc.columns = $dbinfo(type="columns",pattern=argumengs.columnName,table=arguments.tableName,datasource=application.wheels.dataSourceName,username=application.wheels.dataSourceUserName,password=application.wheels.dataSourcePassword);
 	loc.columnDefinition = "";
 	loc.iEnd = loc.columns.RecordCount;
 	for (loc.i=1; loc.i <= loc.iEnd; loc.i++) {
