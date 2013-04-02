@@ -1,7 +1,7 @@
 <cfcomponent extends="plugins.dbmigrate.Migration" hint="test new string types">
   <cffunction name="up">
     <cfscript>
-			t = changeTable(name='string_types');
+			t = createTable(name='string_types');
 			t.char("char_none");
 			t.char(columnNames="char_ascii",encoding="ascii");
 			t.char(columnNames="char_unicode",encoding="unicode");

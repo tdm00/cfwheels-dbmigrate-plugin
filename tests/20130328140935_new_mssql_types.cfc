@@ -1,7 +1,7 @@
 <cfcomponent extends="plugins.dbmigrate.Migration" hint="test new mssql types">
   <cffunction name="up">
     <cfscript>
-			t = changeTable(name='mssql_types');
+			t = createTable(name='mssql_types');
 			t.tinyInteger("test_tinyint");
 			t.smallInteger("test_smallint");
 			t.integer("test_int");

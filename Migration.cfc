@@ -214,55 +214,43 @@
 		</cfscript>
 	</cffunction>
 
+
 	<cffunction name="updateRecord" returntype="void" access="public" hint="updates an existing record in a table">
 		<cfargument name="table" type="string" required="true" hint="table name">
 		<cfargument name="where" type="string" required="false" default="" hint="where condition">
 		<cfscript>
 			var loc = {};
-			loc.columnUpdates = "";
+			loc.values = {};
 			for (loc.key in arguments) {
-				if(loc.key neq "table" && loc.key neq "where") {
-					loc.update = "#this.adapter.quoteColumnName(loc.key)# = ";
-					if(IsNumeric(arguments[loc.key])) {
-						loc.update = loc.update & "#arguments[loc.key]#";
-					} else if(IsBoolean(arguments[loc.key])) {
-						loc.update = loc.update & "#IIf(arguments[loc.key],1,0)#";
-					} else if(IsDate(arguments[loc.key])) {
-						loc.update = loc.update & "#arguments[loc.key]#";
-					} else {
-						arguments[loc.key] = ReplaceNoCase(arguments[loc.key], "'", "''", "all");
-						loc.update = loc.update & "'#arguments[loc.key]#'";
-					}
-					loc.columnUpdates = ListAppend(loc.columnUpdates,loc.update);
+				if(loc.key neq "table" AND loc.key neq "where") {
+					loc.values[ loc.key ] = arguments[ loc.key ];
 				}
 			}
-			if(loc.columnUpdates != '') {
-				loc.sql = 'UPDATE #this.adapter.quoteTableName(LCase(arguments.table))# SET #loc.columnUpdates#';
+			if( NOT structIsEmpty( loc.values ) ) {
+				$execute( this.adapter.updateRecord( arguments.table, arguments.where, loc.values ) );
 				loc.message = 'Updated record(s) in table #arguments.table#';
 				if(arguments.where != '') {
-					loc.sql = loc.sql & ' WHERE #arguments.where#';
 					loc.message = loc.message & ' where #arguments.where#';
 				}
-				$execute(loc.sql);
 				announce(loc.message);
 			}
 		</cfscript>
 	</cffunction>
+	
 
 	<cffunction name="removeRecord" returntype="void" access="public" hint="removes existing records from a table">
 		<cfargument name="table" type="string" required="true" hint="table name">
 		<cfargument name="where" type="string" required="false" default="" hint="where condition">
 		<cfscript>
 			var loc = {};
-			loc.sql = 'DELETE FROM #this.adapter.quoteTableName(LCase(arguments.table))#';
+			$execute( this.adapter.removeRecord( arguments.table, arguments.where ) );
 			loc.message = 'Removed record(s) from table #arguments.table#';
 			if(arguments.where != '') {
-				loc.sql = loc.sql & ' WHERE #arguments.where#';
 				loc.message = loc.message & ' where #arguments.where#';
 			}
-			$execute(loc.sql);
 			announce(loc.message);
 		</cfscript>
 	</cffunction>
+
 
 </cfcomponent>

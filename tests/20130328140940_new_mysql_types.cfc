@@ -1,7 +1,7 @@
 <cfcomponent extends="plugins.dbmigrate.Migration" hint="test new mysql types">
   <cffunction name="up">
     <cfscript>
-			t = changeTable(name='mysql_types');
+			t = createTable(name='mysql_types');
 			t.tinyInteger("test_tinyint1");
 			t.tinyInteger("test_tinyint2", "unsigned");
 			t.integer("test_tinyint3", "tiny unsigned");

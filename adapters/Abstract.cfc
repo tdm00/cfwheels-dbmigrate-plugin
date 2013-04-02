@@ -286,12 +286,24 @@
 		<cfargument name="values" type="struct" required="true" hint="struct of column names and values">
 		<cfscript>
 			var loc = {};
+			loc.columnNames = $getColumns( arguments.table );
+			// pre-fill createdAt column
+			if( NOT structKeyExists( arguments.values, "createdAt" ) AND listFindNoCase( loc.columnNames, "createdAt" ) ) {
+				arguments.values.createdAt = now();
+			}
+			// pre-fill updatedAt column
+			if( NOT structKeyExists( arguments.values, "updatedAt" ) AND listFindNoCase( loc.columnNames, "updatedAt" ) ) {
+				arguments.values.updatedAt = now();
+			}
+			
 			loc.sql = "";
 			loc.columnNames = "";
 			loc.columnValues = "";
 			for (loc.key in arguments.values) {
 				loc.columnNames = ListAppend(loc.columnNames,quoteColumnName(loc.key));
-				if(IsNumeric(arguments.values[loc.key])) {
+				if(arguments.values[loc.key] IS "NULL") {
+					loc.columnValues = ListAppend(loc.columnValues,arguments.values[loc.key]);
+				} else if(IsNumeric(arguments.values[loc.key])) {
 					loc.columnValues = ListAppend(loc.columnValues,arguments.values[loc.key]);
 				} else if(IsBoolean(arguments.values[loc.key])) {
 					loc.columnValues = ListAppend(loc.columnValues,IIf(arguments.values[loc.key],1,0));
@@ -305,6 +317,68 @@
 		</cfscript>
 		
 		<cfreturn loc.sql>
+	</cffunction>
+
+	
+	<cffunction name="updateRecord" returntype="void" access="public" hint="updates an existing record in a table">
+		<cfargument name="table" type="string" required="true" hint="table name">
+		<cfargument name="where" type="string" required="false" default="" hint="where condition">
+		<cfargument name="values" type="struct" required="true" hint="struct of column names and values">
+		<cfscript>
+			var loc = {};
+			loc.columnNames = $getColumns( arguments.table );
+			// pre-fill updatedAt column
+			if( NOT structKeyExists( arguments.values, "updatedAt" ) AND listFindNoCase( loc.columnNames, "updatedAt" ) ) {
+				arguments.values.updatedAt = now();
+			}
+			
+			loc.columnUpdates = "";
+			for (loc.key in arguments.values) {
+				loc.update = "#quoteColumnName(loc.key)# = ";
+				if(arguments.values[loc.key] IS "NULL") {
+					loc.update = loc.update & arguments.values[loc.key];
+				} else if(IsNumeric(arguments.values[loc.key])) {
+					loc.update = loc.update & "#arguments.values[loc.key]#";
+				} else if(IsBoolean(arguments.values[loc.key])) {
+					loc.update = loc.update & "#IIf(arguments.values[loc.key],1,0)#";
+				} else if(IsDate(arguments.values[loc.key])) {
+					loc.update = loc.update & "#arguments.values[loc.key]#";
+				} else {
+					arguments.values[loc.key] = ReplaceNoCase(arguments.values[loc.key], "'", "''", "all");
+					loc.update = loc.update & "'#arguments.values[loc.key]#'";
+				}
+				loc.columnUpdates = ListAppend(loc.columnUpdates,loc.update);
+			}
+			if(loc.columnUpdates != '') {
+				loc.sql = 'UPDATE #quoteTableName(LCase(arguments.table))# SET #loc.columnUpdates#';
+				if(arguments.where != '') {
+					loc.sql = loc.sql & ' WHERE #arguments.where#';
+				}
+				$execute(loc.sql);
+			}
+		</cfscript>
+	</cffunction>
+
+	
+	<cffunction name="removeRecord" returntype="void" access="public" hint="removes existing records from a table">
+		<cfargument name="table" type="string" required="true" hint="table name">
+		<cfargument name="where" type="string" required="false" default="" hint="where condition">
+		<cfscript>
+			var loc = {};
+			loc.columnNames = $getColumns( arguments.table );
+			// pre-fill deleteAt column for a "soft-delete"
+			if( listFindNoCase( loc.columnNames, "deletedAt" ) ) {
+				loc.values = {};
+				loc.values.deletedAt = now();
+				updateRecord( arguments.table, arguments.where, loc.values );
+			} else {
+				loc.sql = 'DELETE FROM #quoteTableName(LCase(arguments.table))#';
+				if(arguments.where != '') {
+					loc.sql = loc.sql & ' WHERE #arguments.where#';
+				}
+				$execute(loc.sql);
+			}
+		</cfscript>
 	</cffunction>
 
 </cfcomponent>
