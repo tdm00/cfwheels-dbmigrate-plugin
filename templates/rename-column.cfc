@@ -13,12 +13,12 @@
 <cfcomponent extends="[extends]" hint="[description]">
   <cffunction name="up">
     <cfscript>
-	    renameColumn(table='tableName', columnName='columnName', newColumnName='newColumnName');
+	    renameColumn(table='[tableName]', columnName='columnName', newColumnName='newColumnName');
     </cfscript>
   </cffunction>
   <cffunction name="down">
     <cfscript>
-	    renameColumn(table='tableName', columnName='columnName', newColumnName='newColumnName');
+	    renameColumn(table='[tableName]', columnName='columnName', newColumnName='newColumnName');
     </cfscript>
   </cffunction>
 </cfcomponent>

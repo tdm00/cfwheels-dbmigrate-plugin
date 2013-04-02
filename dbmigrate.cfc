@@ -121,6 +121,7 @@
 		<cfargument name="migrationName" type="string" required="true" />
 		<cfargument name="templateName" type="string" required="false" default="blank" />
 		<cfargument name="migrationPrefix" type="string" required="false" default="timestamp" />
+		<cfargument name="tableName" type="string" required="false" default="tableName" />
 		<cfif len(trim(arguments.migrationName)) gt 0>
 			<cfreturn $copyTemplateMigrationAndRename(argumentCollection=arguments)>
 		<cfelse>
@@ -162,6 +163,8 @@
 		<cfargument name="migrationName" type="string" required="true" />
 		<cfargument name="templateName" type="string" required="true" />
 		<cfargument name="migrationPrefix" type="string" required="false" default="" />
+		<cfargument name="tableName" type="string" required="false" default="tableName" />
+		
 		<cfset var loc = {}/>
 		<cfset loc.migrationsPath = expandPath("db/migrate")/>
 		<cfset loc.templateFile = expandPath("plugins/dbmigrate/templates") & "/" & arguments.templateName & ".cfc"/>
@@ -181,6 +184,7 @@
 			
 			<cfset loc.templateContent = replace(loc.templateContent, "[extends]", loc.extendsPath)>
 			<cfset loc.templateContent = replace(loc.templateContent, "[description]", replace(arguments.migrationName,'"','&quot;','ALL'))>
+			<cfset loc.templateContent = replace(loc.templateContent, "[tableName]", arguments.tableName, "all")>
 			
 			<cfset loc.migrationFile = REREplace(arguments.migrationName,"[^A-z0-9]+"," ","ALL")>
 			<cfset loc.migrationFile = REREplace(Trim(loc.migrationFile),"[\s]+","_","ALL")>

@@ -11,7 +11,8 @@
 <cfelseif isDefined("Form.migrationName")>
 	<cfparam name="Form.templateName" default="">
 	<cfparam name="Form.migrationPrefix" default="">
-	<cfset flashInsert(dbmigrateFeedback2=application.wheels.plugins.dbmigrate.createMigration(Form.migrationName,Form.templateName,Form.migrationPrefix))>
+	<cfparam name="Form.tableName" default="">
+	<cfset flashInsert(dbmigrateFeedback2=application.wheels.plugins.dbmigrate.createMigration(Form.migrationName,Form.templateName,Form.migrationPrefix,Form.tableName))>
 	<cfset redirectTo(back=true)>
 <cfelseif isDefined("url.migrateToVersion") And Len(Trim(url.migrateToVersion)) GT 0 And IsNumeric(url.migrateToVersion)>
   <cfif isDefined("url.password") And Trim(url.password) EQ application.wheels.reloadPassword>
@@ -116,6 +117,10 @@
 				<div class="eight columns">
 					<label for="migrationName">Migration description: (eg. 'creates member table')</label>
 					<input name="migrationName" type="text" class="">
+				</div>
+				<div class="eight columns">
+					<label for="tableName">Table name: (prefill template)</label>
+					<input name="tableName" type="text" class="">
 				</div>
 				<div class="one columns">
 					<br>
