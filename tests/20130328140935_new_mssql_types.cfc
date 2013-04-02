@@ -8,9 +8,9 @@
 			t.bigInteger("test_bigint");
 			t.date(columnNames="test_date");
 			t.datetime(columnNames="test_datetime");
-			t.datetime(columnNames="test_smalldatetime",precision="small");
+			t.datetime(columnNames="test_smalldatetime",limit="small");
 			t.money(columnNames="test_money");
-			t.money(columnNames="test_smallmoney",precision="small");
+			t.money(columnNames="test_smallmoney",limit="small");
 			t.create();
 			addRecord(table='mssql_types',test_tinyint=1,test_int=2,test_bigint=3,test_date=now(),test_datetime=now(),test_smalldatetime=now(),test_money=4.56,test_smallmoney=7.89 );
     </cfscript>
