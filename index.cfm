@@ -1,7 +1,7 @@
 <cfsetting enablecfoutputonly="true">
 
 <cfset dbmigrateMeta = {}>
-<cfset dbmigrateMeta.version = "1.0.1">
+<cfset dbmigrateMeta.version = "1.0.2">
 
 <cfinclude template="basefunctions.cfm">
 
@@ -114,16 +114,16 @@
 						<option value="execute">Execute operation</option>
 					</select>
 				</div>
-				<div class="eight columns">
+				<div class="three columns">
+					<label for="tableName">Table name: (prefills template)</label>
+					<input name="tableName" type="text" class="">
+				</div>
+				<div class="five columns">
 					<label for="migrationName">Migration description: (eg. 'creates member table')</label>
 					<input name="migrationName" type="text" class="">
 				</div>
-				<div class="eight columns">
-					<label for="tableName">Table name: (prefill template)</label>
-					<input name="tableName" type="text" class="">
-				</div>
 				<div class="one columns">
-					<br>
+					<label>&nbsp;</label>
 					<input type="submit" value="Create" class="small button">
 				</div>
 			</div>
