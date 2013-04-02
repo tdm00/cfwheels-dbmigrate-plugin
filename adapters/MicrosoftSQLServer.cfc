@@ -10,6 +10,7 @@
 	<cfset variables.sqlTypes['float'] = {name='FLOAT'}>
 	<cfset variables.sqlTypes['integer'] = {name='INT'}>
 	<cfset variables.sqlTypes['string'] = {name='VARCHAR',limit=255}>
+	<cfset variables.sqlTypes['char'] = {name='CHAR',limit=64}>
 	<cfset variables.sqlTypes['text'] = {name='TEXT'}>
 	<cfset variables.sqlTypes['time'] = {name='DATETIME'}>
 	<cfset variables.sqlTypes['timestamp'] = {name='DATETIME'}>
@@ -41,17 +42,17 @@
       <cfargument name="primaryKeys" type="array" required="true">
       <cfscript>
       var loc = {};
-	
-	loc.sql = "CONSTRAINT [PK_#arguments.name#] PRIMARY KEY CLUSTERED (";
-	
-	for (loc.i = 1; loc.i lte ArrayLen(arguments.primaryKeys); loc.i++)
-	{
-		if (loc.i != 1) 
-			loc.sql = loc.sql & ", "; 
-		loc.sql = loc.sql & arguments.primaryKeys[loc.i].toColumnNameSQL() & " ASC";
-	}
-	
-	loc.sql = loc.sql & ")"; 
+		
+		loc.sql = "CONSTRAINT [PK_#arguments.name#] PRIMARY KEY CLUSTERED (";
+		
+		for (loc.i = 1; loc.i lte ArrayLen(arguments.primaryKeys); loc.i++)
+		{
+			if (loc.i != 1) 
+				loc.sql = loc.sql & ", "; 
+			loc.sql = loc.sql & arguments.primaryKeys[loc.i].toColumnNameSQL() & " ASC";
+		}
+		
+		loc.sql = loc.sql & ")"; 
       </cfscript>
       <cfreturn loc.sql />
   </cffunction>
@@ -206,23 +207,23 @@
 		<cfargument name="type" type="string" required="true" hint="column type">
 		<cfargument name="options" type="struct" required="false" default="#StructNew()#" hint="column options">
 		<cfscript>
-			var sql = '';
-			if(arguments.type == 'DATETIME' AND StructKeyExists(arguments.options,'limit') AND arguments.options.limit IS 'SMALL') {
+			var sql = super.typeToSQL( argumentCollection = arguments );
+			if(arguments.type IS 'DATETIME' AND StructKeyExists(arguments.options,'limit') AND arguments.options.limit IS 'SMALL') {
 				sql = 'SMALLDATETIME';
-			} else if(arguments.type == 'DATETIME' AND StructKeyExists(arguments.options,'limit') AND isNumeric( arguments.options.limit )) {
+			} else if(arguments.type IS 'DATETIME' AND StructKeyExists(arguments.options,'limit') AND isNumeric( arguments.options.limit )) {
 				sql = 'DATETIME2(#arguments.limit#)';
-			} else if(arguments.type == 'MONEY' AND StructKeyExists(arguments.options,'limit') AND arguments.options.limit IS 'SMALL') {
+			} else if(arguments.type IS 'MONEY' AND StructKeyExists(arguments.options,'limit') AND arguments.options.limit IS 'SMALL') {
 				sql = 'SMALLMONEY';
-			} else if(arguments.type == 'INTEGER' AND StructKeyExists(arguments.options,'limit') AND arguments.options.limit IS 'BIG') {
+			} else if(arguments.type IS 'INTEGER' AND StructKeyExists(arguments.options,'limit') AND arguments.options.limit IS 'BIG') {
 				sql = 'BIGINT';
-			} else if(arguments.type == 'INTEGER' AND StructKeyExists(arguments.options,'limit') AND arguments.options.limit IS 'SMALL') {
+			} else if(arguments.type IS 'INTEGER' AND StructKeyExists(arguments.options,'limit') AND arguments.options.limit IS 'SMALL') {
 				sql = 'SMALLINT';
-			} else if(arguments.type == 'INTEGER' AND StructKeyExists(arguments.options,'limit') AND arguments.options.limit IS 'TINY') {
+			} else if(arguments.type IS 'INTEGER' AND StructKeyExists(arguments.options,'limit') AND arguments.options.limit IS 'TINY') {
 				sql = 'TINYINT';
-			} else if(arguments.type == 'INTEGER' ) {
+			} else if(arguments.type IS 'INTEGER' ) {
 				sql = 'INT';
-			} else {
-				sql = super.typeToSQL( argumentCollection = arguments );
+			} else if(listFindNoCase('CHAR,STRING,TEXT', arguments.type) AND structKeyExists(arguments.options,'encoding') AND listFindNoCase( "utf8,unicode", arguments.options.encoding ) ) {
+				sql = 'N' & sql; // for NCHAR, NVARCHAR, NTEXT
 			}
 		</cfscript>
 		<cfreturn sql>

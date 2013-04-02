@@ -9,6 +9,7 @@
 	<cfset variables.sqlTypes['float'] = {name='FLOAT'}>
 	<cfset variables.sqlTypes['integer'] = {name='INT'}>
 	<cfset variables.sqlTypes['string'] = {name='VARCHAR',limit=255}>
+	<cfset variables.sqlTypes['char'] = {name='CHAR',limit=64}>
 	<cfset variables.sqlTypes['text'] = {name='TEXT'}>
 	<cfset variables.sqlTypes['time'] = {name='TIME'}>
 	<cfset variables.sqlTypes['timestamp'] = {name='TIMESTAMP'}>
@@ -100,9 +101,12 @@
 					sql = 'TINYINT';
 				} else if(isNumeric(arguments.options.limit)){
 					sql = 'INT(#arguments.options.limit#)';
-				} else {
-					sql = 'INT';
 				}
+			} else if(listFindNoCase( 'CHAR,STRING,TEXT', arguments.type ) AND structKeyExists(arguments.options,'encoding') AND len( arguments.options.encoding ) ) {
+				if( arguments.options.encoding IS "unicode" ) {
+					arguments.options.encoding = "utf8";
+				}
+				sql = sql & ' CHARACTER SET #arguments.options.encoding#';,
 			}
 		</cfscript>
 		<cfreturn sql>
