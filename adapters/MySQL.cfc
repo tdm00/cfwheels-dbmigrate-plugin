@@ -37,10 +37,10 @@
 		<cfreturn arguments.sql>
 	</cffunction>
 
-	<!---  MySQL uses angle quotes to escape table and column names --->
+	<!---  MySQL uses angle quotes to escape table and column names, and lowercase is strongly preferred --->
 	<cffunction name="quoteTableName" returntype="string" access="public" hint="surrounds table or index names with quotes">
 		<cfargument name="name" type="string" required="true" hint="column name">
-		<cfreturn "`#Replace(arguments.name,".","`.`","ALL")#`">
+		<cfreturn lCase( "`#Replace(arguments.name,".","`.`","ALL")#`" )>
 	</cffunction>
 
 	<cffunction name="quoteColumnName" returntype="string" access="public" hint="surrounds column names with quotes">
@@ -65,7 +65,7 @@
 		<cfargument name="name" type="string" required="true" hint="table name">
 		<cfargument name="columnName" type="string" required="true" hint="old column name">
 		<cfargument name="newColumnName" type="string" required="true" hint="new column name">
-		<cfreturn "ALTER TABLE #quoteTableName(LCase(arguments.name))# CHANGE COLUMN #quoteColumnName(arguments.columnName)# #quoteColumnName(arguments.newColumnName)# #$getColumnDefinition(tableName=arguments.name,columnName=arguments.columnName)#">
+		<cfreturn "ALTER TABLE #quoteTableName(arguments.name)# CHANGE COLUMN #quoteColumnName(arguments.columnName)# #quoteColumnName(arguments.newColumnName)# #$getColumnDefinition(tableName=arguments.name,columnName=arguments.columnName)#">
 	</cffunction>
 
 	<!--- MySQL requires table name as well as index name --->

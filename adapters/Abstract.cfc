@@ -132,7 +132,7 @@
 		<cfargument name="foreignKeys" type="array" required="false" default="#ArrayNew(1)#" hint="array of foreign key definitions">
 		<cfscript>
 		var loc = {};
-		loc.sql = "CREATE TABLE #quoteTableName(LCase(arguments.name))# (#chr(13)##chr(10)#";
+		loc.sql = "CREATE TABLE #quoteTableName(arguments.name)# (#chr(13)##chr(10)#";
 		
 		loc.iEnd = ArrayLen(arguments.primaryKeys);
 		
@@ -180,44 +180,44 @@
 	
 	<cffunction name="dropTable" returntype="string" access="public" hint="generates sql to drop a table">
 		<cfargument name="name" type="string" required="true" hint="table name">
-		<cfreturn "DROP TABLE IF EXISTS #quoteTableName(LCase(arguments.name))#">
+		<cfreturn "DROP TABLE IF EXISTS #quoteTableName(arguments.name)#">
 	</cffunction>
 
 	<cffunction name="addColumnToTable" returntype="string" access="public" hint="generates sql to add a new column to a table">
 		<cfargument name="name" type="string" required="true" hint="table name">
 		<cfargument name="column" type="any" required="true" hint="column definition object">
-		<cfreturn "ALTER TABLE #quoteTableName(LCase(arguments.name))# ADD COLUMN #arguments.column.toSQL()#" />
+		<cfreturn "ALTER TABLE #quoteTableName(arguments.name)# ADD COLUMN #arguments.column.toSQL()#" />
 	</cffunction>
 	
 	<cffunction name="changeColumnInTable" returntype="string" access="public" hint="generates sql to change an existing column in a table">
 		<cfargument name="name" type="string" required="true" hint="table name">
 		<cfargument name="column" type="any" required="true" hint="column definition object">
-		<cfreturn "ALTER TABLE #quoteTableName(LCase(arguments.name))# CHANGE #quoteColumnName(arguments.column.name)# #arguments.column.toSQL()#">
+		<cfreturn "ALTER TABLE #quoteTableName(arguments.name)# CHANGE #quoteColumnName(arguments.column.name)# #arguments.column.toSQL()#">
 	</cffunction>
 	
 	<cffunction name="renameColumnInTable" returntype="string" access="public" hint="generates sql to rename an existing column in a table">
 		<cfargument name="name" type="string" required="true" hint="table name">
 		<cfargument name="columnName" type="string" required="true" hint="old column name">
 		<cfargument name="newColumnName" type="string" required="true" hint="new column name">
-		<cfreturn "ALTER TABLE #quoteTableName(LCase(arguments.name))# RENAME COLUMN #quoteColumnName(arguments.columnName)# TO #quoteColumnName(arguments.newColumnName)#">
+		<cfreturn "ALTER TABLE #quoteTableName(arguments.name)# RENAME COLUMN #quoteColumnName(arguments.columnName)# TO #quoteColumnName(arguments.newColumnName)#">
 	</cffunction>
 	
 	<cffunction name="dropColumnFromTable" returntype="string" access="public" hint="generates sql to add a foreign key constraint to a table">
 		<cfargument name="name" type="string" required="true" hint="table name">
 		<cfargument name="columnName" type="any" required="true" hint="column name">
-		<cfreturn "ALTER TABLE #quoteTableName(LCase(arguments.name))# DROP COLUMN #quoteColumnName(arguments.columnName)#">
+		<cfreturn "ALTER TABLE #quoteTableName(arguments.name)# DROP COLUMN #quoteColumnName(arguments.columnName)#">
 	</cffunction>
 
 	<cffunction name="addForeignKeyToTable" returntype="string" access="public" hint="generates sql to add a foreign key constraint to a table">
 		<cfargument name="name" type="string" required="true" hint="table name">
 		<cfargument name="foreignKey" type="any" required="true" hint="foreign key definition object">
-		<cfreturn "ALTER TABLE #quoteTableName(LCase(arguments.name))# ADD #arguments.foreignKey.toSQL()#">
+		<cfreturn "ALTER TABLE #quoteTableName(arguments.name)# ADD #arguments.foreignKey.toSQL()#">
 	</cffunction>
 	
 	<cffunction name="dropForeignKeyFromTable" returntype="string" access="public" hint="generates sql to add a foreign key constraint to a table">
 		<cfargument name="name" type="string" required="true" hint="table name">
 		<cfargument name="keyName" type="any" required="true" hint="foreign key name">
-		<cfreturn "ALTER TABLE #quoteTableName(LCase(arguments.name))# DROP FOREIGN KEY #quoteTableName(arguments.keyname)#">
+		<cfreturn "ALTER TABLE #quoteTableName(arguments.name)# DROP FOREIGN KEY #quoteTableName(arguments.keyname)#">
 	</cffunction>
 
 	<cffunction name="foreignKeySQL" returntype="string" access="public" hint="generates sql for foreign key constraint">
@@ -230,7 +230,7 @@
 		<cfargument name="onDelete" type="string" required="false" default="">
 
 		<cfscript>
-			var loc = { sql = "CONSTRAINT #quoteTableName(arguments.name)# FOREIGN KEY (#quoteColumnName(arguments.column)#) REFERENCES #LCase(arguments.referenceTable)#(#quoteColumnName(arguments.referenceColumn)#)" };
+			var loc = { sql = "CONSTRAINT #quoteTableName(arguments.name)# FOREIGN KEY (#quoteColumnName(arguments.column)#) REFERENCES #quoteTableName(arguments.referenceTable)#(#quoteColumnName(arguments.referenceColumn)#)" };
 			for (loc.item in listToArray("onUpdate,onDelete"))
 				{
 					if (len(arguments[loc.item]))
@@ -313,7 +313,7 @@
 					loc.columnValues = ListAppend(loc.columnValues,"'#ReplaceNoCase(arguments.values[loc.key],"'","''","all")#'");
 				}
 			}
-			loc.sql = "INSERT INTO #quoteTableName(LCase(arguments.table))# ( #loc.columnNames# ) VALUES ( #loc.columnValues# )";
+			loc.sql = "INSERT INTO #quoteTableName(arguments.table)# ( #loc.columnNames# ) VALUES ( #loc.columnValues# )";
 		</cfscript>
 		
 		<cfreturn loc.sql>
@@ -350,7 +350,7 @@
 				loc.columnUpdates = ListAppend(loc.columnUpdates,loc.update);
 			}
 			if(loc.columnUpdates != '') {
-				loc.sql = 'UPDATE #quoteTableName(LCase(arguments.table))# SET #loc.columnUpdates#';
+				loc.sql = 'UPDATE #quoteTableName(arguments.table)# SET #loc.columnUpdates#';
 				if(arguments.where != '') {
 					loc.sql = loc.sql & ' WHERE #arguments.where#';
 				}
@@ -372,7 +372,7 @@
 				loc.values.deletedAt = now();
 				updateRecord( arguments.table, arguments.where, loc.values );
 			} else {
-				loc.sql = 'DELETE FROM #quoteTableName(LCase(arguments.table))#';
+				loc.sql = 'DELETE FROM #quoteTableName(arguments.table)#';
 				if(arguments.where != '') {
 					loc.sql = loc.sql & ' WHERE #arguments.where#';
 				}

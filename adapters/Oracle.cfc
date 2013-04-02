@@ -23,6 +23,14 @@
 		<cfreturn "Oracle">
 	</cffunction>
 
+	<cffunction name="quoteTableName" returntype="string" access="public" hint="surrounds table with quotes if it's not in plain lowercase">
+		<cfargument name="name" type="string" required="true" hint="column name">
+		<cfif reFind( "[^a-z]", arguments.name )>
+			<cfreturn '"#arguments.name#"'>
+		</cfif>
+		<cfreturn arguments.name>
+	</cffunction>
+
 	<cffunction name="addPrimaryKeyOptions" returntype="string" access="public">
 		<cfargument name="sql" type="string" required="true" hint="column definition sql">
 		<cfargument name="options" type="struct" required="false" default="#StructNew()#" hint="column options">
@@ -101,19 +109,19 @@
 		announce("Dropped sequence #arguments.name#_seq");
 		</cfscript>
 		<!--- DROP TABLE IF EXISTS IS MORE COMPLEX FOR ORACLE --->
-		<cfreturn "DROP TABLE #quoteTableName(LCase(arguments.name))# PURGE">
+		<cfreturn "DROP TABLE #quoteTableName(arguments.name)# PURGE">
 	</cffunction>
 	
 	<cffunction name="addColumnToTable" returntype="string" access="public" hint="generates sql to add a new column to a table">
 		<cfargument name="name" type="string" required="true" hint="table name">
 		<cfargument name="column" type="any" required="true" hint="column definition object">
-		<cfreturn "ALTER TABLE #quoteTableName(LCase(arguments.name))# ADD #arguments.column.toSQL()#">
+		<cfreturn "ALTER TABLE #quoteTableName(arguments.name)# ADD #arguments.column.toSQL()#">
 	</cffunction>
 	
 	<cffunction name="changeColumnInTable" returntype="string" access="public" hint="generates sql to change an existing column in a table">
 		<cfargument name="name" type="string" required="true" hint="table name">
 		<cfargument name="column" type="any" required="true" hint="column definition object">
-		<cfreturn "ALTER TABLE #quoteTableName(LCase(arguments.name))# MODIFY #arguments.column.toSQL()#">
+		<cfreturn "ALTER TABLE #quoteTableName(arguments.name)# MODIFY #arguments.column.toSQL()#">
 	</cffunction>
 	
 	<!--- renameColumnInTable - use default --->
@@ -125,7 +133,7 @@
 	<cffunction name="dropForeignKeyFromTable" returntype="string" access="public" hint="generates sql to add a foreign key constraint to a table">
 		<cfargument name="name" type="string" required="true" hint="table name">
 		<cfargument name="keyName" type="any" required="true" hint="foreign key name">
-		<cfreturn "ALTER TABLE #quoteTableName(LCase(arguments.name))# DROP CONSTRAINT #quoteTableName(arguments.keyname)#">
+		<cfreturn "ALTER TABLE #quoteTableName(arguments.name)# DROP CONSTRAINT #quoteTableName(arguments.keyname)#">
 	</cffunction>
 	
 	<!--- foreignKeySQL - use default --->

@@ -60,7 +60,7 @@
 	<!---  SQL Server uses square brackets to escape table and column names --->
 	<cffunction name="quoteTableName" returntype="string" access="public" hint="surrounds table or index names with quotes">
 		<cfargument name="name" type="string" required="true" hint="column name">
-		<cfreturn "[#Replace(arguments.name,".","`.`","ALL")#]">
+		<cfreturn "[#Replace(arguments.name,".","].[","ALL")#]">
 	</cffunction>
 
 	<cffunction name="quoteColumnName" returntype="string" access="public" hint="surrounds column names with quotes">
@@ -78,26 +78,26 @@
 
 	<cffunction name="dropTable" returntype="string" access="public" hint="generates sql to drop a table">
 		<cfargument name="name" type="string" required="true" hint="table name">
-		<cfreturn "IF EXISTS(SELECT name FROM sysobjects WHERE name = N'#LCase(arguments.name)#' AND xtype='U') DROP TABLE #quoteTableName(LCase(arguments.name))#">
+		<cfreturn "IF EXISTS(SELECT name FROM sysobjects WHERE name = N'#arguments.name#' AND xtype='U') DROP TABLE #quoteTableName(arguments.name)#">
 	</cffunction>
 	
 	<cffunction name="addColumnToTable" returntype="string" access="public" hint="generates sql to add a new column to a table">
 		<cfargument name="name" type="string" required="true" hint="table name">
 		<cfargument name="column" type="any" required="true" hint="column definition object">
-		<cfreturn "ALTER TABLE #quoteTableName(LCase(arguments.name))# ADD #arguments.column.toSQL()#">
+		<cfreturn "ALTER TABLE #quoteTableName(arguments.name)# ADD #arguments.column.toSQL()#">
 	</cffunction>
 	
 	<cffunction name="changeColumnInTable" returntype="string" access="public" hint="generates sql to change an existing column in a table">
 		<cfargument name="name" type="string" required="true" hint="table name">
 		<cfargument name="column" type="any" required="true" hint="column definition object">
-		<cfreturn "ALTER TABLE #quoteTableName(LCase(arguments.name))# ALTER COLUMN #arguments.column.toSQL()#">
+		<cfreturn "ALTER TABLE #quoteTableName(arguments.name)# ALTER COLUMN #arguments.column.toSQL()#">
 	</cffunction>
 	
 	<cffunction name="renameColumnInTable" returntype="string" access="public" hint="generates sql to rename an existing column in a table">
 		<cfargument name="name" type="string" required="true" hint="table name">
 		<cfargument name="columnName" type="string" required="true" hint="old column name">
 		<cfargument name="newColumnName" type="string" required="true" hint="new column name">
-		<cfreturn "EXEC sp_rename '#LCase(arguments.name)#.#arguments.columnName#', '#arguments.newColumnName#'">
+		<cfreturn "EXEC sp_rename '#arguments.name#.#arguments.columnName#', '#arguments.newColumnName#'">
 	</cffunction>
 	
 	<cffunction name="dropColumnFromTable" returntype="string" access="public" hint="generates sql to add a foreign key constraint to a table">
@@ -106,7 +106,7 @@
 		<cfset $removeCheckConstraints(arguments.name, arguments.columnName)>
 		<cfset $removeDefaultConstraint(arguments.name, arguments.columnName)>
 		<cfset $removeIndexes(arguments.name, arguments.columnName)>
-		<cfreturn "ALTER TABLE #quoteTableName(LCase(arguments.name))# DROP COLUMN #quoteColumnName(arguments.columnName)#">
+		<cfreturn "ALTER TABLE #quoteTableName(arguments.name)# DROP COLUMN #quoteColumnName(arguments.columnName)#">
 	</cffunction>
 	
 	<!--- addForeignKeyToTable - use default --->
@@ -114,7 +114,7 @@
 	<cffunction name="dropForeignKeyFromTable" returntype="string" access="public" hint="generates sql to add a foreign key constraint to a table">
 		<cfargument name="name" type="string" required="true" hint="table name">
 		<cfargument name="keyName" type="any" required="true" hint="foreign key name">
-		<cfreturn "ALTER TABLE #quoteTableName(LCase(arguments.name))# DROP CONSTRAINT #arguments.keyname#">
+		<cfreturn "ALTER TABLE #quoteTableName(arguments.name)# DROP CONSTRAINT #arguments.keyname#">
 	</cffunction>
 	
 	<!--- foreignKeySQL - use default --->
@@ -144,7 +144,7 @@
 		</cfquery>
 		<cfif loc.constraints.RecordCount GT 0>
 			<cfloop query="loc.constraints">
-				<cfset $execute("ALTER TABLE #quoteTableName(LCase(arguments.name))# DROP CONSTRAINT #loc.constraints.constraint_name#")>
+				<cfset $execute("ALTER TABLE #quoteTableName(arguments.name)# DROP CONSTRAINT #loc.constraints.constraint_name#")>
 			</cfloop>
 		</cfif>
 	</cffunction>
@@ -154,7 +154,7 @@
 		<cfargument name="columnName" type="any" required="true" hint="column name">
 		<cfset var loc = {}>
 		<cfquery name="loc.constraints" datasource="#application.wheels.dataSourceName#" username="#application.wheels.dataSourceUserName#" password="#application.wheels.dataSourcePassword#">
-			EXEC sp_helpconstraint #quoteTableName(LCase(arguments.name))#, 'nomsg'
+			EXEC sp_helpconstraint #quoteTableName(arguments.name)#, 'nomsg'
 		</cfquery>
 		<cfif StructKeyExists(loc, "constraints") And loc.constraints.RecordCount NEQ "" And loc.constraints.RecordCount GT 0>
 			<cfquery name="loc.constraints" dbtype="query">
@@ -167,7 +167,7 @@
 						<cfqueryparam cfsqltype="cf_sql_varchar" value="DEFAULT on column #arguments.columnName#">
 			</cfquery>
 			<cfloop query="loc.constraints">
-				<cfset $execute("ALTER TABLE #quoteTableName(LCase(arguments.name))# DROP CONSTRAINT #loc.constraints.constraint_name#")>
+				<cfset $execute("ALTER TABLE #quoteTableName(arguments.name)# DROP CONSTRAINT #loc.constraints.constraint_name#")>
 			</cfloop>
 		</cfif>
 	</cffunction>
@@ -257,9 +257,9 @@
 			
 			// if trying to insert into an identity column wrap it with IDENTITY_INSERT ON/OFF
 			if( len( loc.identityCol ) AND listFindNoCase( structKeyList( arguments.values ), loc.identityCol ) ) {
-				loc.sql = "SET IDENTITY_INSERT #quoteTableName(LCase(arguments.table))# ON;" & chr(10)
+				loc.sql = "SET IDENTITY_INSERT #quoteTableName(arguments.table)# ON;" & chr(10)
 						& loc.sql & ";" & chr(10)
-						& "SET IDENTITY_INSERT #quoteTableName(LCase(arguments.table))# OFF;" & chr(10);
+						& "SET IDENTITY_INSERT #quoteTableName(arguments.table)# OFF;" & chr(10);
 			}
 		</cfscript>
 		<cfreturn loc.sql>
