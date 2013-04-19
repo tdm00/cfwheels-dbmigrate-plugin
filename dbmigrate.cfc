@@ -150,10 +150,18 @@
 		<cfargument name="method" type="string" required="true">
 		<cfscript>
 			var loc = {};
-			arguments.returnVariable = "loc.returnValue";
-			arguments.component = arguments.path & "." & arguments.fileName;
-			StructDelete(arguments, "path");
-			StructDelete(arguments, "fileName");
+			loc.returnValue = "";
+			if( listFind( "1.0,1.0.1,1.0.2,1.0.3,1.0.4,1.0.5,1.1,1.1.3,1.1.4,1.1.5,1.1.6,1.1.7,1.1.8", application.wheels.version ) ) {
+				arguments.returnVariable = "loc.returnValue";
+				arguments.component = arguments.path & "." & arguments.fileName;
+				StructDelete(arguments, "path");
+				StructDelete(arguments, "fileName");
+			} else { // 1.1.9 fix
+				loc.returnVariable = "loc.returnValue";
+				loc.method = arguments.method;
+				loc.component = ListChangeDelims(arguments.path, ".", "/") & "." & ListChangeDelims(arguments.fileName, ".", "/");
+				loc.argumentCollection = arguments;
+			}
 		</cfscript>
 		<cfinclude template="../../root.cfm">
 		<cfreturn loc.returnValue>
