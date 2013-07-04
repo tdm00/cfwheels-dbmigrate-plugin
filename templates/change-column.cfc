@@ -20,12 +20,12 @@
 <cfcomponent extends="[extends]" hint="[description]">
   <cffunction name="up">
     <cfscript>
-	    changeColumn(table='tableName', columnType='', columnName='columnName', default='', null=true);
+	    changeColumn(table='[tableName]', columnType='', columnName='columnName', default='', null=true);
     </cfscript>
   </cffunction>
   <cffunction name="down">
     <cfscript>
-		changeColumn(table='tableName',columnName='columnName');
+		changeColumn(table='[tableName]',columnName='columnName');
     </cfscript>
   </cffunction>
 </cfcomponent>

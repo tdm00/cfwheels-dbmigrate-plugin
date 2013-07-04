@@ -34,7 +34,7 @@
 		<cfargument name="name" type="string" required="yes" hint="primary key column name">
 		<cfargument name="type" type="string" required="false" default="integer" hint="type for the primary key column">
 		<cfargument name="autoIncrement" type="boolean" required="no" default="false">    
-		<cfargument name="limit" type="numeric" required="no" hint="character or integer size">
+		<cfargument name="limit" type="string" required="no" hint="character or integer size">
 		<cfargument name="precision" type="numeric" required="no" hint="number of digits the column can hold">
 		<cfargument name="scale" type="numeric" required="no" hint="number of digits that can be placed to the right of the decimal point (must be less than or equal to precision)">
 		<cfargument name="references" type="string" required="no" hint="table this primary key should reference as a foreign key">
@@ -68,37 +68,21 @@
 		<cfargument name="columnType" type="string" required="yes" hint="column type">
 		<cfargument name="default" type="string" required="no" hint="default value">
 		<cfargument name="null" type="boolean" required="no" hint="whether nulls are allowed">
-		<cfargument name="limit" type="numeric" required="no" hint="character or integer size">
-		<cfargument name="precision" type="numeric" required="no" hint="number of digits the column can hold">
+		<cfargument name="limit" type="string" required="no" hint="character or integer size">
+		<cfargument name="precision" type="string" required="no" hint="number of digits the column can hold">
 		<cfargument name="scale" type="numeric" required="no" hint="number of digits that can be placed to the right of the decimal point (must be less than or equal to precision)">
+		<cfargument name="encoding" type="string" required="no" hint="character encoding: unicode, ascii or others">
 		<cfscript>
 			var loc = {};
 			arguments.adapter = this.adapter;
 			arguments.name = arguments.columnName;
 			arguments.type = arguments.columnType;
-			loc.column = CreateObject("component","ColumnDefinition").init(argumentCollection=arguments);
+			loc.column = createObject("component","ColumnDefinition").init(argumentCollection=arguments);
 			ArrayAppend(this.columns,loc.column);
 		</cfscript>
 		<cfreturn this>
 	</cffunction>
 	
-	<cffunction name="bigInteger" returntype="any" access="public" hint="adds integer columns to table definition">
-		<cfargument name="columnNames" type="string" required="yes" hint="one or more column names, comma delimited">
-		<cfargument name="limit" type="numeric" required="no" hint="integer size">
-		<cfargument name="default" type="string" required="no" hint="default value">
-		<cfargument name="null" type="boolean" required="no" hint="whether nulls are allowed">
-		<cfscript>
-			var loc = {};
-			arguments.columnType = "biginteger";
-			loc.iEnd = ListLen(arguments.columnNames);
-			for (loc.i=1; loc.i <= loc.iEnd; loc.i++) {
-				arguments.columnName = ListGetAt(arguments.columnNames,loc.i);
-				column(argumentCollection=arguments);
-			}
-		</cfscript>
-		<cfreturn this>
-	</cffunction>
-
 	<cffunction name="binary" returntype="any" access="public" hint="adds binary columns to table definition">
 		<cfargument name="columnNames" type="string" required="yes" hint="one or more column names, comma delimited">
 		<cfargument name="default" type="string" required="no" hint="default value">
@@ -151,6 +135,7 @@
 		<cfargument name="columnNames" type="string" required="yes" hint="one or more column names, comma delimited">
 		<cfargument name="default" type="string" required="no" hint="default value">
 		<cfargument name="null" type="boolean" required="no" hint="whether nulls are allowed">
+		<cfargument name="limit" type="string" required="no" hint="Use 'small' for SQL Server SMALLDATETIME or a numeric value for SQL Server DATETIME2">
 		<cfscript>
 			var loc = {};
 			arguments.columnType = "datetime";
@@ -181,6 +166,24 @@
 		<cfreturn this>
 	</cffunction>
 	
+	<cffunction name="money" returntype="any" access="public" hint="adds money columns to table definition">
+		<cfargument name="columnNames" type="string" required="yes" hint="one or more column names, comma delimited">
+		<cfargument name="default" type="string" required="no" hint="default value">
+		<cfargument name="null" type="boolean" required="no" hint="whether nulls are allowed">
+		<cfargument name="precision" type="string" required="no" hint="number of digits or 'small' for sql server">
+		<cfargument name="scale" type="numeric" required="no" hint="number of digits that can be placed to the right of the decimal point (must be less than or equal to precision)">
+		<cfscript>
+			var loc = {};
+			arguments.columnType = "money";
+			loc.iEnd = ListLen(arguments.columnNames);
+			for (loc.i=1; loc.i <= loc.iEnd; loc.i++) {
+				arguments.columnName = ListGetAt(arguments.columnNames,loc.i);
+				column(argumentCollection=arguments);
+			}
+		</cfscript>
+		<cfreturn this>
+	</cffunction>
+	
 	<cffunction name="float" returntype="any" access="public" hint="adds float columns to table definition">
 		<cfargument name="columnNames" type="string" required="yes" hint="one or more column names, comma delimited">
 		<cfargument name="default" type="string" required="no" default="" hint="default value">
@@ -199,7 +202,7 @@
 
 	<cffunction name="integer" returntype="any" access="public" hint="adds integer columns to table definition">
 		<cfargument name="columnNames" type="string" required="yes" hint="one or more column names, comma delimited">
-		<cfargument name="limit" type="numeric" required="no" hint="integer size">
+		<cfargument name="limit" type="string" required="no" hint="integer size or TINY, MEDIUM, SMALL, BIG, UNSIGNED">
 		<cfargument name="default" type="string" required="no" hint="default value">
 		<cfargument name="null" type="boolean" required="no" hint="whether nulls are allowed">
 		<cfscript>
@@ -214,14 +217,69 @@
 		<cfreturn this>
 	</cffunction>
 	
-	<cffunction name="string" returntype="any" access="public" hint="adds string columns to table definition">
+	<cffunction name="tinyInteger" returntype="any" access="public" hint="adds integer columns to table definition">
 		<cfargument name="columnNames" type="string" required="yes" hint="one or more column names, comma delimited">
-		<cfargument name="limit" type="numeric" required="no" hint="character limit">
+		<cfargument name="limit" type="string" required="no" hint="Could still be UNSIGNED">
 		<cfargument name="default" type="string" required="no" hint="default value">
 		<cfargument name="null" type="boolean" required="no" hint="whether nulls are allowed">
+		<cfset arguments.limit = listAppend( arguments.limit, "TINY", " " )>
+		<cfreturn integer( argumentCollection = arguments )>
+	</cffunction>
+	
+	<cffunction name="smallInteger" returntype="any" access="public" hint="adds integer columns to table definition">
+		<cfargument name="columnNames" type="string" required="yes" hint="one or more column names, comma delimited">
+		<cfargument name="limit" type="string" required="no" hint="Could still be UNSIGNED">
+		<cfargument name="default" type="string" required="no" hint="default value">
+		<cfargument name="null" type="boolean" required="no" hint="whether nulls are allowed">
+		<cfset arguments.limit = listAppend( arguments.limit, "SMALL", " " )>
+		<cfreturn integer( argumentCollection = arguments )>
+	</cffunction>
+	
+	<cffunction name="mediumInteger" returntype="any" access="public" hint="adds integer columns to table definition">
+		<cfargument name="columnNames" type="string" required="yes" hint="one or more column names, comma delimited">
+		<cfargument name="limit" type="string" required="no" hint="Could still be UNSIGNED">
+		<cfargument name="default" type="string" required="no" hint="default value">
+		<cfargument name="null" type="boolean" required="no" hint="whether nulls are allowed">
+		<cfset arguments.limit = listAppend( arguments.limit, "MEDIUM", " " )>
+		<cfreturn integer( argumentCollection = arguments )>
+	</cffunction>
+	
+	<cffunction name="bigInteger" returntype="any" access="public" hint="adds integer columns to table definition">
+		<cfargument name="columnNames" type="string" required="yes" hint="one or more column names, comma delimited">
+		<cfargument name="limit" type="string" required="no" hint="Could still be UNSIGNED">
+		<cfargument name="default" type="string" required="no" hint="default value">
+		<cfargument name="null" type="boolean" required="no" hint="whether nulls are allowed">
+		<cfset arguments.limit = listAppend( arguments.limit, "BIG", " " )>
+		<cfreturn integer( argumentCollection = arguments )>
+	</cffunction>
+	
+	<cffunction name="string" returntype="any" access="public" hint="adds string columns to table definition">
+		<cfargument name="columnNames" type="string" required="yes" hint="one or more column names, comma delimited">
+		<cfargument name="limit" type="string" required="no" hint="character limit">
+		<cfargument name="default" type="string" required="no" hint="default value">
+		<cfargument name="null" type="boolean" required="no" hint="whether nulls are allowed">
+		<cfargument name="encoding" type="string" required="no" hint="character encoding: unicode, ascii or others">
 		<cfscript>
 			var loc = {};
 			arguments.columnType = "string";
+			loc.iEnd = ListLen(arguments.columnNames);
+			for (loc.i=1; loc.i <= loc.iEnd; loc.i++) {
+				arguments.columnName = ListGetAt(arguments.columnNames,loc.i);
+				column(argumentCollection=arguments);
+			}
+		</cfscript>
+		<cfreturn this>
+	</cffunction>
+	
+	<cffunction name="char" returntype="any" access="public" hint="adds char columns to table definition">
+		<cfargument name="columnNames" type="string" required="yes" hint="one or more column names, comma delimited">
+		<cfargument name="limit" type="string" required="no" hint="character limit">
+		<cfargument name="default" type="string" required="no" hint="default value">
+		<cfargument name="null" type="boolean" required="no" hint="whether nulls are allowed">
+		<cfargument name="encoding" type="string" required="no" hint="character encoding: unicode, ascii or others">
+		<cfscript>
+			var loc = {};
+			arguments.columnType = "char";
 			loc.iEnd = ListLen(arguments.columnNames);
 			for (loc.i=1; loc.i <= loc.iEnd; loc.i++) {
 				arguments.columnName = ListGetAt(arguments.columnNames,loc.i);
@@ -235,6 +293,7 @@
 		<cfargument name="columnNames" type="string" required="yes" hint="one or more column names, comma delimited">
 		<cfargument name="default" type="string" required="no" hint="default value">
 		<cfargument name="null" type="boolean" required="no" hint="whether nulls are allowed">
+		<cfargument name="encoding" type="string" required="no" hint="character encoding: unicode, ascii or others">
 		<cfscript>
 			var loc = {};
 			arguments.columnType = "text";

@@ -121,6 +121,7 @@
 		<cfargument name="migrationName" type="string" required="true" />
 		<cfargument name="templateName" type="string" required="false" default="blank" />
 		<cfargument name="migrationPrefix" type="string" required="false" default="timestamp" />
+		<cfargument name="tableName" type="string" required="false" default="tableName" />
 		<cfif len(trim(arguments.migrationName)) gt 0>
 			<cfreturn $copyTemplateMigrationAndRename(argumentCollection=arguments)>
 		<cfelse>
@@ -149,10 +150,18 @@
 		<cfargument name="method" type="string" required="true">
 		<cfscript>
 			var loc = {};
-			arguments.returnVariable = "loc.returnValue";
-			arguments.component = arguments.path & "." & arguments.fileName;
-			StructDelete(arguments, "path");
-			StructDelete(arguments, "fileName");
+			loc.returnValue = "";
+			if( listFind( "1.0,1.0.1,1.0.2,1.0.3,1.0.4,1.0.5,1.1,1.1.3,1.1.4,1.1.5,1.1.6,1.1.7,1.1.8", application.wheels.version ) ) {
+				arguments.returnVariable = "loc.returnValue";
+				arguments.component = arguments.path & "." & arguments.fileName;
+				StructDelete(arguments, "path");
+				StructDelete(arguments, "fileName");
+			} else { // 1.1.9 fix
+				loc.returnVariable = "loc.returnValue";
+				loc.method = arguments.method;
+				loc.component = ListChangeDelims(arguments.path, ".", "/") & "." & ListChangeDelims(arguments.fileName, ".", "/");
+				loc.argumentCollection = arguments;
+			}
 		</cfscript>
 		<cfinclude template="../../root.cfm">
 		<cfreturn loc.returnValue>
@@ -162,6 +171,8 @@
 		<cfargument name="migrationName" type="string" required="true" />
 		<cfargument name="templateName" type="string" required="true" />
 		<cfargument name="migrationPrefix" type="string" required="false" default="" />
+		<cfargument name="tableName" type="string" required="false" default="tableName" />
+		
 		<cfset var loc = {}/>
 		<cfset loc.migrationsPath = expandPath("db/migrate")/>
 		<cfset loc.templateFile = expandPath("plugins/dbmigrate/templates") & "/" & arguments.templateName & ".cfc"/>
@@ -181,6 +192,7 @@
 			
 			<cfset loc.templateContent = replace(loc.templateContent, "[extends]", loc.extendsPath)>
 			<cfset loc.templateContent = replace(loc.templateContent, "[description]", replace(arguments.migrationName,'"','&quot;','ALL'))>
+			<cfset loc.templateContent = replace(loc.templateContent, "[tableName]", arguments.tableName, "all")>
 			
 			<cfset loc.migrationFile = REREplace(arguments.migrationName,"[^A-z0-9]+"," ","ALL")>
 			<cfset loc.migrationFile = REREplace(Trim(loc.migrationFile),"[\s]+","_","ALL")>

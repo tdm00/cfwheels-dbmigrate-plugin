@@ -9,9 +9,11 @@
 	<cfset variables.sqlTypes['float'] = {name='FLOAT'}>
 	<cfset variables.sqlTypes['integer'] = {name='INTEGER'}>
 	<cfset variables.sqlTypes['string'] = {name='CHARACTER VARYING',limit=255}>
+	<cfset variables.sqlTypes['char'] = {name='CHARACTER',limit=64}>
 	<cfset variables.sqlTypes['text'] = {name='TEXT'}>
 	<cfset variables.sqlTypes['time'] = {name='TIME'}>
 	<cfset variables.sqlTypes['timestamp'] = {name='TIMESTAMP'}>
+	<cfset variables.sqlTypes['money'] = {name='DECIMAL',precision=19,scale=4}>
 
 	<cffunction name="adapterName" returntype="string" access="public" hint="name of database adapter">
 		<cfreturn "PostgreSQL">
@@ -29,7 +31,14 @@
 		<cfreturn arguments.sql>
 	</cffunction>
 
-	<!--- postgres uses double quotes --->
+	<cffunction name="quoteTableName" returntype="string" access="public" hint="surrounds table with quotes if it's not in plain lowercase">
+		<cfargument name="name" type="string" required="true" hint="column name">
+		<cfif reFind( "[^a-z]", arguments.name )>
+			<cfreturn '"#arguments.name#"'>
+		</cfif>
+		<cfreturn arguments.name>
+	</cffunction>
+	
 	<cffunction name="quoteColumnName" returntype="string" access="public" hint="surrounds column names with quotes">
 		<cfargument name="name" type="string" required="true" hint="column name">
 		<cfreturn '"#arguments.name#"'>
@@ -60,7 +69,7 @@
 	<cffunction name="dropForeignKeyFromTable" returntype="string" access="public" hint="generates sql to add a foreign key constraint to a table">
 		<cfargument name="name" type="string" required="true" hint="table name">
 		<cfargument name="keyName" type="any" required="true" hint="foreign key name">
-		<cfreturn "ALTER TABLE #quoteTableName(LCase(arguments.name))# DROP CONSTRAINT #quoteTableName(arguments.keyname)#">
+		<cfreturn "ALTER TABLE #quoteTableName(arguments.name)# DROP CONSTRAINT #quoteTableName(arguments.keyname)#">
 	</cffunction>
 	
 	<!--- foreignKeySQL - use default --->

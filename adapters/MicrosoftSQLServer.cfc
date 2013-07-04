@@ -4,15 +4,17 @@
 	<cfset variables.sqlTypes['primaryKey'] = "int NOT NULL IDENTITY (1, 1)">
 	<cfset variables.sqlTypes['binary'] = {name='IMAGE'}>
 	<cfset variables.sqlTypes['boolean'] = {name='BIT'}>
-	<cfset variables.sqlTypes['date'] = {name='DATETIME'}>
+	<cfset variables.sqlTypes['date'] = {name='DATE'}>
 	<cfset variables.sqlTypes['datetime'] = {name='DATETIME'}>
 	<cfset variables.sqlTypes['decimal'] = {name='DECIMAL'}>
 	<cfset variables.sqlTypes['float'] = {name='FLOAT'}>
 	<cfset variables.sqlTypes['integer'] = {name='INT'}>
 	<cfset variables.sqlTypes['string'] = {name='VARCHAR',limit=255}>
+	<cfset variables.sqlTypes['char'] = {name='CHAR',limit=64}>
 	<cfset variables.sqlTypes['text'] = {name='TEXT'}>
 	<cfset variables.sqlTypes['time'] = {name='DATETIME'}>
 	<cfset variables.sqlTypes['timestamp'] = {name='DATETIME'}>
+	<cfset variables.sqlTypes['money'] = {name='MONEY'}>
 
 	<cffunction name="adapterName" returntype="string" access="public" hint="name of database adapter">
 		<cfreturn "MicrosoftSQLServer">
@@ -40,17 +42,17 @@
       <cfargument name="primaryKeys" type="array" required="true">
       <cfscript>
       var loc = {};
-	
-	loc.sql = "CONSTRAINT [PK_#arguments.name#] PRIMARY KEY CLUSTERED (";
-	
-	for (loc.i = 1; loc.i lte ArrayLen(arguments.primaryKeys); loc.i++)
-	{
-		if (loc.i != 1) 
-			loc.sql = loc.sql & ", "; 
-		loc.sql = loc.sql & arguments.primaryKeys[loc.i].toColumnNameSQL() & " ASC";
-	}
-	
-	loc.sql = loc.sql & ")"; 
+		
+		loc.sql = "CONSTRAINT [PK_#arguments.name#] PRIMARY KEY CLUSTERED (";
+		
+		for (loc.i = 1; loc.i lte ArrayLen(arguments.primaryKeys); loc.i++)
+		{
+			if (loc.i != 1) 
+				loc.sql = loc.sql & ", "; 
+			loc.sql = loc.sql & arguments.primaryKeys[loc.i].toColumnNameSQL() & " ASC";
+		}
+		
+		loc.sql = loc.sql & ")"; 
       </cfscript>
       <cfreturn loc.sql />
   </cffunction>
@@ -58,7 +60,7 @@
 	<!---  SQL Server uses square brackets to escape table and column names --->
 	<cffunction name="quoteTableName" returntype="string" access="public" hint="surrounds table or index names with quotes">
 		<cfargument name="name" type="string" required="true" hint="column name">
-		<cfreturn "[#Replace(arguments.name,".","`.`","ALL")#]">
+		<cfreturn "[#Replace(arguments.name,".","].[","ALL")#]">
 	</cffunction>
 
 	<cffunction name="quoteColumnName" returntype="string" access="public" hint="surrounds column names with quotes">
@@ -76,26 +78,26 @@
 
 	<cffunction name="dropTable" returntype="string" access="public" hint="generates sql to drop a table">
 		<cfargument name="name" type="string" required="true" hint="table name">
-		<cfreturn "IF EXISTS(SELECT name FROM sysobjects WHERE name = N'#LCase(arguments.name)#' AND xtype='U') DROP TABLE #quoteTableName(LCase(arguments.name))#">
+		<cfreturn "IF EXISTS(SELECT name FROM sysobjects WHERE name = N'#arguments.name#' AND xtype='U') DROP TABLE #quoteTableName(arguments.name)#">
 	</cffunction>
 	
 	<cffunction name="addColumnToTable" returntype="string" access="public" hint="generates sql to add a new column to a table">
 		<cfargument name="name" type="string" required="true" hint="table name">
 		<cfargument name="column" type="any" required="true" hint="column definition object">
-		<cfreturn "ALTER TABLE #quoteTableName(LCase(arguments.name))# ADD #arguments.column.toSQL()#">
+		<cfreturn "ALTER TABLE #quoteTableName(arguments.name)# ADD #arguments.column.toSQL()#">
 	</cffunction>
 	
 	<cffunction name="changeColumnInTable" returntype="string" access="public" hint="generates sql to change an existing column in a table">
 		<cfargument name="name" type="string" required="true" hint="table name">
 		<cfargument name="column" type="any" required="true" hint="column definition object">
-		<cfreturn "ALTER TABLE #quoteTableName(LCase(arguments.name))# ALTER COLUMN #arguments.column.toSQL()#">
+		<cfreturn "ALTER TABLE #quoteTableName(arguments.name)# ALTER COLUMN #arguments.column.toSQL()#">
 	</cffunction>
 	
 	<cffunction name="renameColumnInTable" returntype="string" access="public" hint="generates sql to rename an existing column in a table">
 		<cfargument name="name" type="string" required="true" hint="table name">
 		<cfargument name="columnName" type="string" required="true" hint="old column name">
 		<cfargument name="newColumnName" type="string" required="true" hint="new column name">
-		<cfreturn "EXEC sp_rename '#LCase(arguments.name)#.#arguments.columnName#', '#arguments.newColumnName#'">
+		<cfreturn "EXEC sp_rename '#arguments.name#.#arguments.columnName#', '#arguments.newColumnName#'">
 	</cffunction>
 	
 	<cffunction name="dropColumnFromTable" returntype="string" access="public" hint="generates sql to add a foreign key constraint to a table">
@@ -104,7 +106,7 @@
 		<cfset $removeCheckConstraints(arguments.name, arguments.columnName)>
 		<cfset $removeDefaultConstraint(arguments.name, arguments.columnName)>
 		<cfset $removeIndexes(arguments.name, arguments.columnName)>
-		<cfreturn "ALTER TABLE #quoteTableName(LCase(arguments.name))# DROP COLUMN #quoteColumnName(arguments.columnName)#">
+		<cfreturn "ALTER TABLE #quoteTableName(arguments.name)# DROP COLUMN #quoteColumnName(arguments.columnName)#">
 	</cffunction>
 	
 	<!--- addForeignKeyToTable - use default --->
@@ -112,7 +114,7 @@
 	<cffunction name="dropForeignKeyFromTable" returntype="string" access="public" hint="generates sql to add a foreign key constraint to a table">
 		<cfargument name="name" type="string" required="true" hint="table name">
 		<cfargument name="keyName" type="any" required="true" hint="foreign key name">
-		<cfreturn "ALTER TABLE #quoteTableName(LCase(arguments.name))# DROP CONSTRAINT #arguments.keyname#">
+		<cfreturn "ALTER TABLE #quoteTableName(arguments.name)# DROP CONSTRAINT #arguments.keyname#">
 	</cffunction>
 	
 	<!--- foreignKeySQL - use default --->
@@ -142,7 +144,7 @@
 		</cfquery>
 		<cfif loc.constraints.RecordCount GT 0>
 			<cfloop query="loc.constraints">
-				<cfset $execute("ALTER TABLE #quoteTableName(LCase(arguments.name))# DROP CONSTRAINT #loc.constraints.constraint_name#")>
+				<cfset $execute("ALTER TABLE #quoteTableName(arguments.name)# DROP CONSTRAINT #loc.constraints.constraint_name#")>
 			</cfloop>
 		</cfif>
 	</cffunction>
@@ -152,7 +154,7 @@
 		<cfargument name="columnName" type="any" required="true" hint="column name">
 		<cfset var loc = {}>
 		<cfquery name="loc.constraints" datasource="#application.wheels.dataSourceName#" username="#application.wheels.dataSourceUserName#" password="#application.wheels.dataSourcePassword#">
-			EXEC sp_helpconstraint #quoteTableName(LCase(arguments.name))#, 'nomsg'
+			EXEC sp_helpconstraint #quoteTableName(arguments.name)#, 'nomsg'
 		</cfquery>
 		<cfif StructKeyExists(loc, "constraints") And loc.constraints.RecordCount NEQ "" And loc.constraints.RecordCount GT 0>
 			<cfquery name="loc.constraints" dbtype="query">
@@ -165,7 +167,7 @@
 						<cfqueryparam cfsqltype="cf_sql_varchar" value="DEFAULT on column #arguments.columnName#">
 			</cfquery>
 			<cfloop query="loc.constraints">
-				<cfset $execute("ALTER TABLE #quoteTableName(LCase(arguments.name))# DROP CONSTRAINT #loc.constraints.constraint_name#")>
+				<cfset $execute("ALTER TABLE #quoteTableName(arguments.name)# DROP CONSTRAINT #loc.constraints.constraint_name#")>
 			</cfloop>
 		</cfif>
 	</cffunction>
@@ -205,52 +207,64 @@
 		<cfargument name="type" type="string" required="true" hint="column type">
 		<cfargument name="options" type="struct" required="false" default="#StructNew()#" hint="column options">
 		<cfscript>
-		var sql = '';
-		if(IsDefined("variables.sqlTypes") && structKeyExists(variables.sqlTypes,arguments.type)) {
-			if(IsStruct(variables.sqlTypes[arguments.type])) {
-				sql = variables.sqlTypes[arguments.type]['name'];
-				if(arguments.type == 'decimal') {
-					if(!StructKeyExists(arguments.options,'precision') && StructKeyExists(variables.sqlTypes[arguments.type],'precision')) {
-						arguments.options.precision = variables.sqlTypes[arguments.type]['precision'];
-					}
-					if(!StructKeyExists(arguments.options,'scale') && StructKeyExists(variables.sqlTypes[arguments.type],'scale')) {
-						arguments.options.scale = variables.sqlTypes[arguments.type]['scale'];
-					}
-					if(StructKeyExists(arguments.options,'precision')) {
-						if(StructKeyExists(arguments.options,'scale')) {
-							sql = sql & '(#arguments.options.precision#,#arguments.options.scale#)';
-						} else {
-							sql = sql & '(#arguments.options.precision#)';
-						}
-					}
-				} else if(arguments.type == 'integer') {
-					if(StructKeyExists(arguments.options,'limit')) {
-						sql = sql;
-					}
-				} else {
-					if(!StructKeyExists(arguments.options,'limit') && StructKeyExists(variables.sqlTypes[arguments.type],'limit')) {
-						arguments.options.limit = variables.sqlTypes[arguments.type]['limit'];
-					}
-					if(StructKeyExists(arguments.options,'limit')) {
-						sql = sql & '(#arguments.options.limit#)';
-					}
-				}
-			} else {
-				sql = variables.sqlTypes[arguments.type];
+			var sql = super.typeToSQL( argumentCollection = arguments );
+			if(arguments.type IS 'DATETIME' AND StructKeyExists(arguments.options,'limit') AND arguments.options.limit IS 'SMALL') {
+				sql = 'SMALLDATETIME';
+			} else if(arguments.type IS 'DATETIME' AND StructKeyExists(arguments.options,'limit') AND isNumeric( arguments.options.limit )) {
+				sql = 'DATETIME2(#arguments.options.limit#)';
+			} else if(arguments.type IS 'MONEY' AND StructKeyExists(arguments.options,'limit') AND arguments.options.limit IS 'SMALL') {
+				sql = 'SMALLMONEY';
+			} else if(arguments.type IS 'INTEGER' AND StructKeyExists(arguments.options,'limit') AND arguments.options.limit IS 'BIG') {
+				sql = 'BIGINT';
+			} else if(arguments.type IS 'INTEGER' AND StructKeyExists(arguments.options,'limit') AND arguments.options.limit IS 'SMALL') {
+				sql = 'SMALLINT';
+			} else if(arguments.type IS 'INTEGER' AND StructKeyExists(arguments.options,'limit') AND arguments.options.limit IS 'TINY') {
+				sql = 'TINYINT';
+			} else if(arguments.type IS 'INTEGER' ) {
+				sql = 'INT';
+			} else if(listFindNoCase('CHAR,STRING,TEXT', arguments.type) AND structKeyExists(arguments.options,'encoding') AND listFindNoCase( "utf8,unicode", arguments.options.encoding ) ) {
+				sql = 'N' & sql; // for NCHAR, NVARCHAR, NTEXT
 			}
-		}
 		</cfscript>
 		<cfreturn sql>
 	</cffunction>
-
-	<cffunction name="addRecordPrefix" returntype="string" access="public" hint="prepends sql server identity_insert on to allow inserting primary key values">
-		<cfargument name="table" type="string" required="true" hint="table name">
-		<cfreturn "SET IDENTITY_INSERT #quoteTableName(LCase(arguments.table))# ON">
+	
+	<cffunction name="$getIdentityColumn" returntype="string" access="private">
+		<cfargument name="tableName" type="string" required="yes" hint="table name">
+		<cfscript>
+		loc = {};
+	  	loc.columns = $dbinfo(type="columns",table=arguments.tableName,datasource=application.wheels.dataSourceName,username=application.wheels.dataSourceUserName,password=application.wheels.dataSourcePassword);
+		loc.identityCol = "";
+		loc.iEnd = loc.columns.RecordCount;
+		for (loc.i=1; loc.i <= loc.iEnd; loc.i++) {
+			if( listFindNoCase( loc.columns["TYPE_NAME"][loc.i], "identity", " " ) ) {
+				loc.identityCol = listAppend( loc.identityCol, loc.columns["COLUMN_NAME"][loc.i] );
+				break;
+			}
+		}
+		</cfscript>
+		<cfreturn loc.identityCol>
 	</cffunction>
 
-	<cffunction name="addRecordSuffix" returntype="string" access="public" hint="appends sql server identity_insert on to disallow inserting primary key values">
+
+	<cffunction name="addRecord" returntype="string" access="public" hint="adds a record to a table">
 		<cfargument name="table" type="string" required="true" hint="table name">
-		<cfreturn "SET IDENTITY_INSERT #quoteTableName(LCase(arguments.table))# OFF">
+		<cfargument name="values" type="struct" required="true" hint="struct of column names and values">
+		<cfscript>
+			var loc = {};
+			loc.sql = super.addRecord( arguments.table, arguments.values );
+			loc.identityCol= $getIdentityColumn( arguments.table );
+			
+			// if trying to insert into an identity column wrap it with IDENTITY_INSERT ON/OFF
+			if( len( loc.identityCol ) AND listFindNoCase( structKeyList( arguments.values ), loc.identityCol ) ) {
+				loc.sql = "SET IDENTITY_INSERT #quoteTableName(arguments.table)# ON;" & chr(10)
+						& loc.sql & ";" & chr(10)
+						& "SET IDENTITY_INSERT #quoteTableName(arguments.table)# OFF;" & chr(10);
+			}
+		</cfscript>
+		<cfreturn loc.sql>
 	</cffunction>
+
 
 </cfcomponent>
+

@@ -21,7 +21,7 @@
 <cfcomponent extends="[extends]" hint="[description]">
   <cffunction name="up">
     <cfscript>
-      t = createTable(name='tableName');
+      t = createTable(name='[tableName]');
       
       t.timestamps();
       t.create();
@@ -29,7 +29,7 @@
   </cffunction>
   <cffunction name="down">
     <cfscript>
-      dropTable('tableName');
+      dropTable('[tableName]');
     </cfscript>
   </cffunction>
 </cfcomponent>

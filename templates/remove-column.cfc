@@ -13,12 +13,12 @@
 <cfcomponent extends="[extends]" hint="[description]">
   <cffunction name="up">
     <cfscript>
-		removeColumn(table='tableName',columnName='columnName');
+		removeColumn(table='[tableName]',columnName='columnName');
     </cfscript>
   </cffunction>
   <cffunction name="down">
     <cfscript>
-	    addColumn(table='tableName', columnType='', columnName='columnName', default='', null=true);
+	    addColumn(table='[tableName]', columnType='', columnName='columnName', default='', null=true);
     </cfscript>
   </cffunction>
 </cfcomponent>

@@ -12,12 +12,12 @@
 <cfcomponent extends="[extends]" hint="[description]">
   <cffunction name="up">
     <cfscript>
-	    addRecord(table='tableName',field='');
+	    addRecord(table='[tableName]',field='');
     </cfscript>
   </cffunction>
   <cffunction name="down">
     <cfscript>
-		removeRecord(table='tableName',where='');
+		removeRecord(table='[tableName]',where='');
     </cfscript>
   </cffunction>
 </cfcomponent>

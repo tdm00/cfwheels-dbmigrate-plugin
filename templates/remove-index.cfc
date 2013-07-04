@@ -12,12 +12,12 @@
 <cfcomponent extends="[extends]" hint="[description]">
   <cffunction name="up">
     <cfscript>
-	    removeIndex(table='tableName', indexName='');
+	    removeIndex(table='[tableName]', indexName='');
     </cfscript>
   </cffunction>
   <cffunction name="down">
     <cfscript>
-		addIndex(table='tableName',columnNames='columnName',unique=true);
+		addIndex(table='[tableName]',columnNames='columnName',unique=true);
     </cfscript>
   </cffunction>
 </cfcomponent>

@@ -1,7 +1,7 @@
 <cfsetting enablecfoutputonly="true">
 
 <cfset dbmigrateMeta = {}>
-<cfset dbmigrateMeta.version = "1.0.1">
+<cfset dbmigrateMeta.version = "1.0.2">
 
 <cfinclude template="basefunctions.cfm">
 
@@ -11,7 +11,8 @@
 <cfelseif isDefined("Form.migrationName")>
 	<cfparam name="Form.templateName" default="">
 	<cfparam name="Form.migrationPrefix" default="">
-	<cfset flashInsert(dbmigrateFeedback2=application.wheels.plugins.dbmigrate.createMigration(Form.migrationName,Form.templateName,Form.migrationPrefix))>
+	<cfparam name="Form.tableName" default="">
+	<cfset flashInsert(dbmigrateFeedback2=application.wheels.plugins.dbmigrate.createMigration(Form.migrationName,Form.templateName,Form.migrationPrefix,Form.tableName))>
 	<cfset redirectTo(back=true)>
 <cfelseif isDefined("url.migrateToVersion") And Len(Trim(url.migrateToVersion)) GT 0 And IsNumeric(url.migrateToVersion)>
   <cfif isDefined("url.password") And Trim(url.password) EQ application.wheels.reloadPassword>
@@ -113,12 +114,16 @@
 						<option value="execute">Execute operation</option>
 					</select>
 				</div>
-				<div class="eight columns">
+				<div class="three columns">
+					<label for="tableName">Table name: (prefills template)</label>
+					<input name="tableName" type="text" class="">
+				</div>
+				<div class="five columns">
 					<label for="migrationName">Migration description: (eg. 'creates member table')</label>
 					<input name="migrationName" type="text" class="">
 				</div>
 				<div class="one columns">
-					<br>
+					<label>&nbsp;</label>
 					<input type="submit" value="Create" class="small button">
 				</div>
 			</div>

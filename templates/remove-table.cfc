@@ -11,12 +11,12 @@
 <cfcomponent extends="[extends]" hint="[description]">
   <cffunction name="up">
     <cfscript>
-	    dropTable(name='tableName');
+	    dropTable(name='[tableName]');
     </cfscript>
   </cffunction>
   <cffunction name="down">
     <cfscript>
-	    t = createTable(name='tableName');
+	    t = createTable(name='[tableName]');
 	   
 	    t.timestamps();
 	    t.create();
