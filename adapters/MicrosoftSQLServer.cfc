@@ -211,7 +211,7 @@
 			if(arguments.type IS 'DATETIME' AND StructKeyExists(arguments.options,'limit') AND arguments.options.limit IS 'SMALL') {
 				sql = 'SMALLDATETIME';
 			} else if(arguments.type IS 'DATETIME' AND StructKeyExists(arguments.options,'limit') AND isNumeric( arguments.options.limit )) {
-				sql = 'DATETIME2(#arguments.limit#)';
+				sql = 'DATETIME2(#arguments.options.limit#)';
 			} else if(arguments.type IS 'MONEY' AND StructKeyExists(arguments.options,'limit') AND arguments.options.limit IS 'SMALL') {
 				sql = 'SMALLMONEY';
 			} else if(arguments.type IS 'INTEGER' AND StructKeyExists(arguments.options,'limit') AND arguments.options.limit IS 'BIG') {
