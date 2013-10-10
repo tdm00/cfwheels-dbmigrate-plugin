@@ -228,6 +228,33 @@
 		</cfscript>
 		<cfreturn sql>
 	</cffunction>
+
+	<cffunction name="addColumnOptions" returntype="string" access="public">
+		<cfargument name="sql" type="string" required="true" hint="column definition sql">
+		<cfargument name="options" type="struct" required="false" default="#StructNew()#" hint="column options">
+		<cfscript>
+			if(StructKeyExists(arguments.options,'type') && arguments.options.type != 'primaryKey') {
+				if(StructKeyExists(arguments.options,'default') && optionsIncludeDefault(argumentCollection=arguments.options)) {
+					if(arguments.options.default eq "NULL" || (arguments.options.default eq "" && ListFindNoCase("boolean,date,datetime,time,timestamp,decimal,float,integer",arguments.options.type))) {
+						arguments.sql = arguments.sql & " DEFAULT NULL";
+					} else if( find( "(", arguments.options.default ) AND find( ")", arguments.options.default ) ) { // SQL Functions
+						arguments.sql = arguments.sql & " DEFAULT #arguments.options.default#";
+					} else if(arguments.options.type == 'boolean') {
+						arguments.sql = arguments.sql & " DEFAULT #IIf(arguments.options.default,1,0)#";
+					} else if(arguments.options.type == 'string' && arguments.options.default eq "") {
+						arguments.sql = arguments.sql & " DEFAULT ''";
+					} else {
+						arguments.sql = arguments.sql & " DEFAULT #quote(value=arguments.options.default,options=arguments.options)#";
+					}
+				}
+				if(StructKeyExists(arguments.options,'null') && !arguments.options.null) {
+					arguments.sql = arguments.sql & " NOT NULL";
+				}
+			}
+
+		</cfscript>
+		<cfreturn arguments.sql>
+	</cffunction>
 	
 	<cffunction name="$getIdentityColumn" returntype="string" access="private">
 		<cfargument name="tableName" type="string" required="yes" hint="table name">
