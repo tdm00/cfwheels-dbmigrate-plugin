@@ -25,7 +25,18 @@
 	</cffunction>
 	
 	<cffunction name="toSQL" returntype="string" access="public">
-		loc.args = "adapter,table,referenceTable,column,referenceColumn,onUpdate,onDelete";
+		<cfscript>
+			var loc = {};
+			loc.args = "name,table,referenceTable,column,referenceColumn,onUpdate,onDelete";
+			loc.iEnd = ListLen(loc.args);
+			loc.adapterArgs = {};
+			for (loc.i = 1; loc.i <= loc.iEnd; loc.i++) {
+				loc.argumentName = ListGetAt(loc.args, loc.i);
+				loc.adapterArgs[loc.argumentName] = this[loc.argumentName];
+			}
+
+			return this.adapter.foreignKeySQL(argumentcollection: loc.adapterArgs);
+		</cfscript>
 	</cffunction>
 
 </cfcomponent>
