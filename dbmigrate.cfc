@@ -142,20 +142,20 @@
 		</cfquery>
 	</cffunction>	
 	
-	<!--- this function copied from /wheels/global/internal.cfm  --->
-	<cffunction name="$createObjectFromRoot" returntype="any" access="private" output="false">
+	<cffunction name="$createObjectFromRoot" returntype="any" access="public" output="false">
 		<cfargument name="path" type="string" required="true">
 		<cfargument name="fileName" type="string" required="true">
 		<cfargument name="method" type="string" required="true">
 		<cfscript>
+			var returnValue = "";
 			var loc = {};
-			arguments.returnVariable = "loc.returnValue";
-			arguments.component = arguments.path & "." & arguments.fileName;
-			StructDelete(arguments, "path");
-			StructDelete(arguments, "fileName");
+			loc.returnVariable = "returnValue";
+			loc.method = arguments.method;
+			loc.component = ListChangeDelims(arguments.path, ".", "/") & "." & ListChangeDelims(arguments.fileName, ".", "/");
+			loc.argumentCollection = arguments;
 		</cfscript>
 		<cfinclude template="../../root.cfm">
-		<cfreturn loc.returnValue>
+		<cfreturn returnValue>
 	</cffunction>
 
 	<cffunction name="$copyTemplateMigrationAndRename" displayname="$copyTemplateMigrationAndRename" access="private" returntype="string">
