@@ -18,6 +18,23 @@
 		<cfreturn "MicrosoftSQLServer">
 	</cffunction>
 
+	<cffunction name="addForeignKeyOptions" returntype="string" access="public">
+		<cfargument name="sql" type="string" required="true" hint="column definition sql">
+		<cfargument name="options" type="struct" required="false" default="#StructNew()#" hint="column options">
+		<cfscript>
+			arguments.sql = arguments.sql & " FOREIGN KEY (" & arguments.options.column & ")";
+			if (StructKeyExists(arguments.options, "referenceTable")){
+				if (StructKeyExists(arguments.options, "referenceColumn")){
+					arguments.sql = arguments.sql & " REFERENCES ";
+					arguments.sql = arguments.sql & arguments.options.referenceTable;
+					arguments.sql = arguments.sql & " (" & arguments.options.referenceColumn & ")";
+				}
+			}
+		
+		</cfscript>
+		<cfreturn arguments.sql>
+	</cffunction>
+
 	<cffunction name="addPrimaryKeyOptions" returntype="string" access="public">
 		<cfargument name="sql" type="string" required="true" hint="column definition sql">
 		<cfargument name="options" type="struct" required="false" default="#StructNew()#" hint="column options">

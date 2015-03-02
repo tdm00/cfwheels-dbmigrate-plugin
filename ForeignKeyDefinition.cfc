@@ -28,4 +28,30 @@
 		loc.args = "adapter,table,referenceTable,column,referenceColumn,onUpdate,onDelete";
 	</cffunction>
 
+	<cffunction name="toForeignKeySQL" returntype="string" access="public">
+		<cfscript>
+			var sql = "CONSTRAINT " & this.name;
+			sql = addForeignKeyOptions(sql);
+			</cfscript>
+			<cfreturn sql>
+	    </cffunction>
+	    
+	   <cffunction name="addForeignKeyOptions" returntype="string" access="public">
+			<cfargument name="sql" type="string" required="yes" hint="column definition sql">
+			<cfscript>
+			var loc = {};
+			loc.options = {};
+			loc.optionalArguments = "referenceTable,referenceColumn,column";
+			loc.iEnd = ListLen(loc.optionalArguments);
+			for (loc.i=1; loc.i <= loc.iEnd; loc.i++) {
+				loc.argumentName = ListGetAt(loc.optionalArguments,loc.i);
+				if(StructKeyExists(this,loc.argumentName)) {
+					loc.options[loc.argumentName] = this[loc.argumentName];
+				}
+			}
+			arguments.sql = this.adapter.addForeignKeyOptions(sql=arguments.sql,options=loc.options);
+		</cfscript>
+		<cfreturn arguments.sql>
+	</cffunction>
+
 </cfcomponent>
