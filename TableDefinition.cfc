@@ -230,6 +230,23 @@
 		</cfscript>
 		<cfreturn this>
 	</cffunction>
+
+	<cffunction name="char" returntype="any" access="public" hint="adds char columns to table definition">
+		<cfargument name="columnNames" type="string" required="yes" hint="one or more column names, comma delimited">
+		<cfargument name="limit" type="any" required="no" hint="character limit">
+		<cfargument name="default" type="string" required="no" hint="default value">
+		<cfargument name="null" type="boolean" required="no" hint="whether nulls are allowed">
+		<cfscript>
+			var loc = {};
+			arguments.columnType = "char";
+			loc.iEnd = ListLen(arguments.columnNames);
+			for (loc.i=1; loc.i <= loc.iEnd; loc.i++) {
+				arguments.columnName = ListGetAt(arguments.columnNames,loc.i);
+				column(argumentCollection=arguments);
+			}
+		</cfscript>
+		<cfreturn this>
+	</cffunction>
 	
 	<cffunction name="text" returntype="any" access="public" hint="adds text columns to table definition">
 		<cfargument name="columnNames" type="string" required="yes" hint="one or more column names, comma delimited">
