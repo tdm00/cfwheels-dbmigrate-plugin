@@ -165,7 +165,7 @@
 		// define the foreign keys
 		loc.iEnd = ArrayLen(arguments.foreignKeys);
 		for (loc.i=1; loc.i <= loc.iEnd; loc.i++) {
-			loc.sql = loc.sql & ",#chr(13)##chr(10)# " & arguments.foreignKeys[loc.i].toSQL();
+			loc.sql = loc.sql & ",#chr(13)##chr(10)# " & arguments.foreignKeys[loc.i].toForeignKeySQL();
 		}
 		loc.sql = loc.sql & "#chr(13)##chr(10)#)";
 		</cfscript>
