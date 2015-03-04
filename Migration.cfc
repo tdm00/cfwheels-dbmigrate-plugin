@@ -34,6 +34,14 @@
 		</cfscript>
 		<cfreturn CreateObject("component","TableDefinition").init(argumentCollection=arguments)>
 	</cffunction>
+
+	<cffunction name="createView" returntype="ViewDefinition" access="public" hint="creates a view definition object to store view properties">
+		<cfargument name="name" type="string" required="true" hint="view name">
+		<cfscript>
+			arguments.adapter = this.adapter;
+		</cfscript>
+		<cfreturn CreateObject("component","ViewDefinition").init(argumentCollection=arguments)>
+	</cffunction>
 	
 	<cffunction name="changeTable" returntype="TableDefinition" access="public" hint="creates a table definition object to store modifications to table properties">
 		<cfargument name="name" type="string" required="true" hint="table name in pluralized form">
@@ -64,6 +72,14 @@
     	}
 	    $execute(this.adapter.dropTable(name=arguments.name));
 	    announce("Dropped table #arguments.name#");
+		</cfscript>
+	</cffunction>
+
+	<cffunction name="dropView" returntype="void" access="public" hint="drops a view from the database">
+		<cfargument name="name" type="string" required="true" hint="view name">
+		<cfscript>
+	    $execute(this.adapter.dropView(name=arguments.name));
+	    announce("Dropped view #arguments.name#");
 		</cfscript>
 	</cffunction>
 	

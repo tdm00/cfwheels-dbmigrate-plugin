@@ -13,6 +13,8 @@
 	<cfset variables.sqlTypes['text'] = {name='TEXT'}>
 	<cfset variables.sqlTypes['time'] = {name='DATETIME'}>
 	<cfset variables.sqlTypes['timestamp'] = {name='DATETIME'}>
+	<cfset variables.sqlTypes['uniqueidentifier'] = {name='UNIQUEIDENTIFIER'} >
+	<cfset variables.sqlTypes['char'] = {name='CHAR',limit=10} >
 
 	<cffunction name="adapterName" returntype="string" access="public" hint="name of database adapter">
 		<cfreturn "MicrosoftSQLServer">
@@ -84,6 +86,18 @@
 	</cffunction>
 
 	<!--- createTable - use default --->
+
+	<cffunction name="createView" returntype="string" access="public" hint="generates sql to create a view">
+		<cfargument name="name" type="string" required="true" hint="view name">
+		<cfargument name="sql" type="string" required="true" hint="select sql">
+		<cfscript>
+		var loc = {};
+		loc.sql = "CREATE VIEW #quoteTableName(LCase(arguments.name))# AS ";
+		loc.sql = loc.sql & arguments.sql;
+		</cfscript>
+		<cfdump var="#loc.sql#" />
+		<cfreturn loc.sql>
+	</cffunction>
 	
 	<cffunction name="renameTable" returntype="string" access="public" hint="generates sql to rename a table">
 		<cfargument name="oldName" type="string" required="true" hint="old table name">
@@ -94,6 +108,11 @@
 	<cffunction name="dropTable" returntype="string" access="public" hint="generates sql to drop a table">
 		<cfargument name="name" type="string" required="true" hint="table name">
 		<cfreturn "IF EXISTS(SELECT name FROM sysobjects WHERE name = N'#LCase(arguments.name)#' AND xtype='U') DROP TABLE #quoteTableName(LCase(arguments.name))#">
+	</cffunction>
+
+	<cffunction name="dropView" returntype="string" access="public" hint="generates sql to drop a view">
+		<cfargument name="name" type="string" required="true" hint="view name">
+		<cfreturn "IF EXISTS(SELECT name FROM sysobjects WHERE name = N'#LCase(arguments.name)#' AND xtype='V') DROP VIEW #quoteTableName(LCase(arguments.name))#">
 	</cffunction>
 	
 	<cffunction name="addColumnToTable" returntype="string" access="public" hint="generates sql to add a new column to a table">
