@@ -20,16 +20,56 @@
 --->
 <cfcomponent extends="[extends]" hint="[description]">
   <cffunction name="up">
-    <cfscript>
-      t = createTable(name='tableName');
-      
-      t.timestamps();
-      t.create();
-    </cfscript>
+  	<cfset hasError = false />
+  	<cftransaction>
+	    <cfscript>
+	    	try{
+				t = createTable(name='tableName');
+				  
+				t.timestamps();
+				t.create();
+	    	}
+	    	catch (any ex){
+	    		hasError = true;
+		      	catchObject = ex;
+	    	}
+	      
+	    </cfscript>
+	     <cfif hasError>
+	    	<cftransaction action="rollback" />
+	    	<cfthrow 
+			    detail = "#catchObject.detail#"
+			    errorCode = "1"
+			    message = "#catchObject.message#"
+			    type = "Any">
+	    <cfelse>
+	    	<cftransaction action="commit" />
+	    </cfif>
+	 </cftransaction>
   </cffunction>
   <cffunction name="down">
-    <cfscript>
-      dropTable('tableName');
-    </cfscript>
+  	<cfset hasError = false />
+  	<cftransaction>
+	    <cfscript>
+	    	try{
+	    		dropTable('tableName');
+	    	}
+	    	catch (any ex){
+	    		hasError = true;
+		      	catchObject = ex;
+	    	}
+	      
+	    </cfscript>
+	    <cfif hasError>
+	    	<cftransaction action="rollback" />
+	    	<cfthrow 
+			    detail = "#catchObject.detail#"
+			    errorCode = "1"
+			    message = "#catchObject.message#"
+			    type = "Any">
+	    <cfelse>
+	    	<cftransaction action="commit" />
+	    </cfif>
+	 </cftransaction>
   </cffunction>
 </cfcomponent>

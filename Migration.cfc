@@ -60,18 +60,18 @@
 	<cffunction name="dropTable" returntype="void" access="public" hint="drops a table from the database">
 		<cfargument name="name" type="string" required="true" hint="table name">
 		<cfscript>
-    	var loc = {};
-    	if (application.wheels.serverName != "railo")
-    	{
-				loc.foreignKeys = $getForeignKeys(arguments.name);
-				loc.iEnd = ListLen(loc.foreignKeys);
-    		for (loc.i=1; loc.i <= loc.iEnd; loc.i++) {
-    			loc.foreignKeyName = ListGetAt(loc.foreignKeys,loc.i);
-    			dropForeignKey(table=arguments.name,keyname=loc.foreignKeyName);
-    		}
-    	}
-	    $execute(this.adapter.dropTable(name=arguments.name));
-	    announce("Dropped table #arguments.name#");
+	    	var loc = {};
+	    	if (application.wheels.serverName != "railo")
+	    	{
+					loc.foreignKeys = $getForeignKeys(arguments.name);
+					loc.iEnd = ListLen(loc.foreignKeys);
+	    		for (loc.i=1; loc.i <= loc.iEnd; loc.i++) {
+	    			loc.foreignKeyName = ListGetAt(loc.foreignKeys,loc.i);
+	    			dropForeignKey(table=arguments.name,keyname=loc.foreignKeyName);
+	    		}
+	    	}
+		    $execute(this.adapter.dropTable(name=arguments.name));
+		    announce("Dropped table #arguments.name#");
 		</cfscript>
 	</cffunction>
 
