@@ -11,13 +11,53 @@
 --->
 <cfcomponent extends="[extends]" hint="[description]">
   <cffunction name="up">
-    <cfscript>
-	    removeIndex(table='tableName', indexName='');
-    </cfscript>
+  	<cfset hasError = false />
+  	<cftransaction>
+	    <cfscript>
+	    	try{
+	    		removeIndex(table='tableName', indexName='');
+	    	}
+	    	catch (any ex){
+	    		hasError = true;
+		      	catchObject = ex;
+	    	}
+		    
+	    </cfscript>
+	    <cfif hasError>
+	    	<cftransaction action="rollback" />
+	    	<cfthrow 
+			    detail = "#catchObject.detail#"
+			    errorCode = "1"
+			    message = "#catchObject.message#"
+			    type = "Any">
+	    <cfelse>
+	    	<cftransaction action="commit" />
+	    </cfif>
+	 </cftransaction>
   </cffunction>
   <cffunction name="down">
-    <cfscript>
-		addIndex(table='tableName',columnNames='columnName',unique=true);
-    </cfscript>
+  	<cfset hasError = false />
+  	<cftransaction>
+	    <cfscript>
+	    	try{
+	    		addIndex(table='tableName',columnNames='columnName',unique=true);
+	    	}
+	    	catch (any ex){
+	    		hasError = true;
+		      	catchObject = ex;
+	    	}
+			
+	    </cfscript>
+	     <cfif hasError>
+	    	<cftransaction action="rollback" />
+	    	<cfthrow 
+			    detail = "#catchObject.detail#"
+			    errorCode = "1"
+			    message = "#catchObject.message#"
+			    type = "Any">
+	    <cfelse>
+	    	<cftransaction action="commit" />
+	    </cfif>
+	 </cftransaction>
   </cffunction>
 </cfcomponent>
