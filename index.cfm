@@ -1,7 +1,7 @@
 <cfsetting enablecfoutputonly="true">
 
 <cfset dbmigrateMeta = {}>
-<cfset dbmigrateMeta.version = "1.0.1">
+<cfset dbmigrateMeta.version = "1.0.2">
 
 <cfinclude template="basefunctions.cfm">
 
