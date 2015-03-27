@@ -1,7 +1,7 @@
 <cfcomponent output="false" mixin="none" environment="design,development,maintenance">
 	
 	<cffunction name="init">
-		<cfset this.version = "1.0,1.0.1,1.0.2,1.0.3,1.0.4,1.0.5,1.1,1.1.3,1.1.4,1.1.5,1.1.6,1.1.7,1.1.8">
+		<cfset this.version = "1.0,1.0.1,1.0.2,1.0.3,1.0.4,1.0.5,1.1,1.1.3,1.1.4,1.1.5,1.1.6,1.1.7,1.1.8,1.3.4">
 		<cfreturn this>
 	</cffunction>
 	
@@ -109,7 +109,10 @@
 					<cfif ListFind(loc.listVersionsPreviouslyMigrated, loc.migration.version) neq 0>
 						<cfset loc.migration.status = "migrated">
 					</cfif>
-					<cfcatch type="any"><cfset loc.migration.loadError = CFCATCH.Message></cfcatch>
+					<cfcatch type="any">
+						<cfdump var="#cfcatch#">
+						<cfabort>
+					<cfset loc.migration.loadError = CFCATCH.Message></cfcatch>
 				</cftry>
 				<cfset ArrayAppend(loc.migrations,loc.migration)>
 			</cfif>
@@ -143,20 +146,23 @@
 	</cffunction>	
 	
 	<!--- this function copied from /wheels/global/internal.cfm  --->
-	<cffunction name="$createObjectFromRoot" returntype="any" access="private" output="false">
+	<cffunction name="$createObjectFromRoot" returntype="any" access="public" output="false">
 		<cfargument name="path" type="string" required="true">
 		<cfargument name="fileName" type="string" required="true">
 		<cfargument name="method" type="string" required="true">
 		<cfscript>
+			var returnValue = "";
 			var loc = {};
-			arguments.returnVariable = "loc.returnValue";
-			arguments.component = arguments.path & "." & arguments.fileName;
-			StructDelete(arguments, "path");
-			StructDelete(arguments, "fileName");
+			loc.returnVariable = "returnValue";
+			loc.method = arguments.method;
+			loc.component = ListChangeDelims(arguments.path, ".", "/") & "." & ListChangeDelims(arguments.fileName, ".", "/");
+			loc.argumentCollection = arguments;
 		</cfscript>
+
 		<cfinclude template="../../root.cfm">
-		<cfreturn loc.returnValue>
+		<cfreturn returnValue>
 	</cffunction>
+
 
 	<cffunction name="$copyTemplateMigrationAndRename" displayname="$copyTemplateMigrationAndRename" access="private" returntype="string">
 		<cfargument name="migrationName" type="string" required="true" />
