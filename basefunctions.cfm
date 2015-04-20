@@ -20,7 +20,7 @@
 	<cfif StructKeyExists(Request, "migrationSQLFile")>
 		<cffile action="append" file="#Request.migrationSQLFile#" output="#arguments.sql#;" addNewLine="yes" fixNewLine="yes">
 	</cfif>
-	<cfquery datasource="#application.wheels.dataSourceName#" username="#application.wheels.dataSourceUserName#" password="#application.wheels.dataSourcePassword#">
+	<cfquery datasource="#application.wheels.dataSourceName#">
 	#PreserveSingleQuotes(arguments.sql)#
 	</cfquery>
 </cffunction>
