@@ -1,7 +1,7 @@
 <cfsetting enablecfoutputonly="true">
 
 <cfset dbmigrateMeta = {}>
-<cfset dbmigrateMeta.version = "1.3.3">
+<cfset dbmigrateMeta.version = "1.1.2">
 
 <cfinclude template="basefunctions.cfm">
 <!--- explicitly set url to avoid odd issue when ses urls enabled --->
