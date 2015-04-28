@@ -165,7 +165,7 @@
 		<cfargument name="name" type="string" required="true" hint="table name">
 		<cfargument name="columnName" type="any" required="true" hint="column name">
 		<cfset var loc = {}>
-		<cfquery name="loc.constraints" datasource="#application.wheels.dataSourceName#" username="#application.wheels.dataSourceUserName#" password="#application.wheels.dataSourcePassword#">
+		<cfquery name="loc.constraints" datasource="#application.wheels.dataSourceName#" >
 			SELECT
 				constraint_name
 			FROM
@@ -187,7 +187,7 @@
 		<cfargument name="name" type="string" required="true" hint="table name">
 		<cfargument name="columnName" type="any" required="true" hint="column name">
 		<cfset var loc = {}>
-		<cfquery name="loc.constraints" datasource="#application.wheels.dataSourceName#" username="#application.wheels.dataSourceUserName#" password="#application.wheels.dataSourcePassword#">
+		<cfquery name="loc.constraints" datasource="#application.wheels.dataSourceName#" >
 			EXEC sp_helpconstraint #quoteTableName(LCase(arguments.name))#, 'nomsg'
 		</cfquery>
 		<cfif StructKeyExists(loc, "constraints") And loc.constraints.RecordCount NEQ "" And loc.constraints.RecordCount GT 0>
@@ -211,7 +211,7 @@
 		<cfargument name="columnName" type="any" required="true" hint="column name">
 		<cfset var loc = {}>
 		<!--- Based on info presented in `http://stackoverflow.com/questions/765867/list-of-all-index-index-columns-in-sql-server-db` --->
-		<cfquery name="loc.indexes" datasource="#application.wheels.dataSourceName#" username="#application.wheels.dataSourceUserName#" password="#application.wheels.dataSourcePassword#">
+		<cfquery name="loc.indexes" datasource="#application.wheels.dataSourceName#" >
 			SELECT
 				t.name AS table_name,
 				col.name AS column_name,
