@@ -1,5 +1,8 @@
 # Changelog
 
+* 1.1.2
+  * Removed username and password from cfquery to prevent issue in ColdFusion that does not allow different combinations of credentials
+
 * 1.1.1
   * Merge Pull Request Below - Fixed username and password bug on cfquery that caused a datasource auth mismatch
   * [https://github.com/jkeczan/cfwheels-dbmigrate-plugin/pull/4](https://github.com/jkeczan/cfwheels-dbmigrate-plugin/pull/4)
