@@ -130,14 +130,14 @@
 	
 	<cffunction name="$setVersionAsMigrated" access="private">
 		<cfargument name="version" required="true" type="string">
-		<cfquery datasource="#application.wheels.dataSourceName#" username="#application.wheels.dataSourceUserName#" password="#application.wheels.dataSourcePassword#">
+		<cfquery datasource="#application.wheels.dataSourceName#">
 		INSERT INTO schemainfo (version) VALUES (<cfqueryparam cfsqltype="cf_sql_varchar" value="#arguments.version#">)
 		</cfquery>
 	</cffunction>
 	
 	<cffunction name="$removeVersionAsMigrated" access="private">
 		<cfargument name="version" required="true" type="string">
-		<cfquery datasource="#application.wheels.dataSourceName#" username="#application.wheels.dataSourceUserName#" password="#application.wheels.dataSourcePassword#">
+		<cfquery datasource="#application.wheels.dataSourceName#" >
 		DELETE FROM schemainfo WHERE version = <cfqueryparam cfsqltype="cf_sql_varchar" value="#arguments.version#">
 		</cfquery>
 	</cffunction>	
@@ -222,11 +222,11 @@
 	<cffunction name="$getVersionsPreviouslyMigrated" access="private" returntype="string">
 		<cfset var loc = {}>
 		<cftry>
-			<cfquery name="loc.qMigratedVersions" datasource="#application.wheels.dataSourceName#" username="#application.wheels.dataSourceUserName#" password="#application.wheels.dataSourcePassword#">
+			<cfquery name="loc.qMigratedVersions" datasource="#application.wheels.dataSourceName#" >
 			SELECT version FROM schemainfo ORDER BY version ASC
 			</cfquery>
 			<cfcatch type="database">
-				<cfquery datasource="#application.wheels.dataSourceName#" username="#application.wheels.dataSourceUserName#" password="#application.wheels.dataSourcePassword#">
+				<cfquery datasource="#application.wheels.dataSourceName#" >
 				CREATE TABLE schemainfo (version VARCHAR(25))
 				</cfquery>
 				<cfreturn "0">
