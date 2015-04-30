@@ -12,15 +12,55 @@
 --->
 <cfcomponent extends="[extends]" hint="[description]">
   <cffunction name="up">
-    <cfscript>
-    t = changeTable('tableName');
-    
-    t.change();
-    </cfscript>
+  	<cfset hasError = false />
+  	<cftransaction>
+	    <cfscript>
+	    	try{
+	    		t = changeTable('tableName');
+	    
+	   			t.change();
+	    	}
+	    	catch (any ex){
+	    		hasError = true;
+		      	catchObject = ex;
+	    	}
+	    
+	    </cfscript>
+	    <cfif hasError>
+	    	<cftransaction action="rollback" />
+	    	<cfthrow 
+			    detail = "#catchObject.detail#"
+			    errorCode = "1"
+			    message = "#catchObject.message#"
+			    type = "Any">
+	    <cfelse>
+	    	<cftransaction action="commit" />
+	    </cfif>
+	 </cftransaction>
   </cffunction>
   <cffunction name="down">
-    <cfscript>
-    removeColumn(table='tableName',columnName='columnName');
-    </cfscript>
+  	<cfset hasError = false />
+  	<cftransaction>
+	    <cfscript>
+	    	try{
+	    		removeColumn(table='tableName',columnName='columnName');
+	    	}
+	    	catch (any ex){
+	    		hasError = true;
+		      	catchObject = ex;
+	    	}
+	    
+	    </cfscript>
+	    <cfif hasError>
+	    	<cftransaction action="rollback" />
+	    	<cfthrow 
+			    detail = "#catchObject.detail#"
+			    errorCode = "1"
+			    message = "#catchObject.message#"
+			    type = "Any">
+	    <cfelse>
+	    	<cftransaction action="commit" />
+	    </cfif>
+	 </cftransaction>
   </cffunction>
 </cfcomponent>

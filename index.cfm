@@ -1,22 +1,23 @@
 <cfsetting enablecfoutputonly="true">
 
 <cfset dbmigrateMeta = {}>
-<cfset dbmigrateMeta.version = "1.0.1">
+<cfset dbmigrateMeta.version = "1.1.2">
 
 <cfinclude template="basefunctions.cfm">
-
+<!--- explicitly set url to avoid odd issue when ses urls enabled --->
+<cfset selfUrl = "?controller=wheels&action=wheels&view=plugins&name=dbmigrate">
 <cfif isDefined("Form.version")>
 	<cfset flashInsert(dbmigrateFeedback=application.wheels.plugins.dbmigrate.migrateTo(Form.version))>
-	<cfset redirectTo(controller="wheels", action="wheels", params="view=plugins&name=dbmigrate")>
+	<cflocation url="#selfUrl#" addtoken="false">
 <cfelseif isDefined("Form.migrationName")>
 	<cfparam name="Form.templateName" default="">
 	<cfparam name="Form.migrationPrefix" default="">
 	<cfset flashInsert(dbmigrateFeedback2=application.wheels.plugins.dbmigrate.createMigration(Form.migrationName,Form.templateName,Form.migrationPrefix))>
-	<cfset redirectTo(controller="wheels", action="wheels", params="view=plugins&name=dbmigrate")>
+	<cflocation url="#selfUrl#" addtoken="false">
 <cfelseif isDefined("url.migrateToVersion") And Len(Trim(url.migrateToVersion)) GT 0 And IsNumeric(url.migrateToVersion)>
   <cfif isDefined("url.password") And Trim(url.password) EQ application.wheels.reloadPassword>
   	<cfset flashInsert(dbmigrateFeedback=application.wheels.plugins.dbmigrate.migrateTo(url.migrateToVersion))>
-  	<cfset redirectTo(controller="wheels", action="wheels", params="view=plugins&name=dbmigrate")>
+  	<cflocation url="#selfUrl#" addtoken="false">
   </cfif>
 </cfif>
 

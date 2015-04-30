@@ -1,5 +1,16 @@
 # Changelog
 
+* 1.1.2
+  * Removed username and password from cfquery to prevent issue in ColdFusion that does not allow different combinations of credentials
+
+* 1.1.1
+  * Merge Pull Request Below - Fixed username and password bug on cfquery that caused a datasource auth mismatch
+  * [https://github.com/jkeczan/cfwheels-dbmigrate-plugin/pull/4](https://github.com/jkeczan/cfwheels-dbmigrate-plugin/pull/4)
+
+* 1.1.0
+  * Added additional datatypes for Microsoft SQL Server 2014 Compatibility
+  * Allowed limits to be added for string columns
+
 * 1.0.0
   * Fixed: String values with more then one single quote aren't being escaped in generated SQL for updateRecord  - [https://github.com/tdm00/cfwheels-dbmigrate-plugin/issues/73](https://github.com/tdm00/cfwheels-dbmigrate-plugin/issues/73)
 

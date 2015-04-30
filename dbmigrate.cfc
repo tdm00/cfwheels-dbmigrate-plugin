@@ -1,7 +1,7 @@
 <cfcomponent output="false" mixin="none" environment="design,development,maintenance">
 	
 	<cffunction name="init">
-		<cfset this.version = "1.0,1.0.1,1.0.2,1.0.3,1.0.4,1.0.5,1.1,1.1.3,1.1.4,1.1.5,1.1.6,1.1.7,1.1.8">
+		<cfset this.version = "1.0,1.0.1,1.0.2,1.0.3,1.0.4,1.0.5,1.1,1.1.3,1.1.4,1.1.5,1.1.6,1.1.7,1.1.8,1.3.3,1.3.4">
 		<cfreturn this>
 	</cffunction>
 	
@@ -25,7 +25,7 @@
 					<cfset loc.migration = loc.migrations[loc.i]>
 					<cfif loc.migration.version lte arguments.version><cfbreak></cfif>
 					<cfif loc.migration.status eq "migrated">
-            <!--- <cftransaction action="begin"> --->
+            		<cftransaction action="begin">
   						<cftry>
   							<cfset loc.feedback = loc.feedback & "#chr(13)#------- " & loc.migration.cfcfile & " #RepeatString("-",Max(5,50-Len(loc.migration.cfcfile)))##chr(13)#">
   							<cfset Request.migrationOutput = "">
@@ -36,12 +36,12 @@
   							<cfset $removeVersionAsMigrated(loc.migration.version)>
   							<cfcatch type="any">
   								<cfset loc.feedback = loc.feedback & "Error migrating to #loc.migration.version#.#chr(13)##CFCATCH.Message##chr(13)##CFCATCH.Detail##chr(13)#">
-                  <!--- <cftransaction action="rollback" /> --->
+                  				<cftransaction action="rollback" /> 
   								<cfbreak>
   							</cfcatch>
   						</cftry>
-              <!--- <cftransaction action="commit" />
-            </cftransaction> --->
+              			<cftransaction action="commit" />
+          				</cftransaction>
 					</cfif>
 				</cfloop>
 			<cfelse>
@@ -49,23 +49,23 @@
 				<cfloop index="loc.i" from="1" to="#ArrayLen(loc.migrations)#">
 					<cfset loc.migration = loc.migrations[loc.i]>
 					<cfif loc.migration.version lte arguments.version and loc.migration.status neq "migrated">
-            <!--- <cftransaction action="begin"> --->
-  						<cftry>
-  							<cfset loc.feedback = loc.feedback & "#chr(13)#-------- " & loc.migration.cfcfile & " #RepeatString("-",Max(5,50-Len(loc.migration.cfcfile)))##chr(13)#">
-  							<cfset Request.migrationOutput = "">
-  							<cfset Request.migrationSQLFile = "#loc.sqlPath#/#loc.migration.cfcfile#_up.sql">
-  							<cffile action="write" file="#Request.migrationSQLFile#" output="">
-  							<cfset loc.migration.cfc.up()>
-  							<cfset loc.feedback = loc.feedback & Request.migrationOutput>
-  							<cfset $setVersionAsMigrated(loc.migration.version)>
-  							<cfcatch type="any">
-  								<cfset loc.feedback = loc.feedback & "Error migrating to #loc.migration.version#.#chr(13)##CFCATCH.Message##chr(13)##CFCATCH.Detail##chr(13)#">
-                  <!--- <cftransaction action="rollback" /> --->
-                  <cfbreak>
-  							</cfcatch>
-  						</cftry>
-              <!--- <cftransaction action="commit" />
-            </cftransaction> --->
+	            		<cftransaction action="begin">
+	  						<cftry>
+	  							<cfset loc.feedback = loc.feedback & "#chr(13)#-------- " & loc.migration.cfcfile & " #RepeatString("-",Max(5,50-Len(loc.migration.cfcfile)))##chr(13)#">
+	  							<cfset Request.migrationOutput = "">
+	  							<cfset Request.migrationSQLFile = "#loc.sqlPath#/#loc.migration.cfcfile#_up.sql">
+	  							<cffile action="write" file="#Request.migrationSQLFile#" output="">
+	  							<cfset loc.migration.cfc.up()>
+	  							<cfset loc.feedback = loc.feedback & Request.migrationOutput>
+	  							<cfset $setVersionAsMigrated(loc.migration.version)>
+	  							<cfcatch type="any">
+	  								<cfset loc.feedback = loc.feedback & "Error migrating to #loc.migration.version#.#chr(13)##CFCATCH.Message##chr(13)##CFCATCH.Detail##chr(13)#">
+	                  				<cftransaction action="rollback" />
+	                 				<cfbreak>
+	  							</cfcatch>
+	  						</cftry>
+	              			<cftransaction action="commit" />
+	            		</cftransaction> 
 					<cfelseif loc.migration.version gt arguments.version>
 						<cfbreak>			
 					</cfif>
@@ -130,32 +130,32 @@
 	
 	<cffunction name="$setVersionAsMigrated" access="private">
 		<cfargument name="version" required="true" type="string">
-		<cfquery datasource="#application.wheels.dataSourceName#" username="#application.wheels.dataSourceUserName#" password="#application.wheels.dataSourcePassword#">
+		<cfquery datasource="#application.wheels.dataSourceName#">
 		INSERT INTO schemainfo (version) VALUES (<cfqueryparam cfsqltype="cf_sql_varchar" value="#arguments.version#">)
 		</cfquery>
 	</cffunction>
 	
 	<cffunction name="$removeVersionAsMigrated" access="private">
 		<cfargument name="version" required="true" type="string">
-		<cfquery datasource="#application.wheels.dataSourceName#" username="#application.wheels.dataSourceUserName#" password="#application.wheels.dataSourcePassword#">
+		<cfquery datasource="#application.wheels.dataSourceName#" >
 		DELETE FROM schemainfo WHERE version = <cfqueryparam cfsqltype="cf_sql_varchar" value="#arguments.version#">
 		</cfquery>
 	</cffunction>	
 	
-	<!--- this function copied from /wheels/global/internal.cfm  --->
-	<cffunction name="$createObjectFromRoot" returntype="any" access="private" output="false">
+	<cffunction name="$createObjectFromRoot" returntype="any" access="public" output="false">
 		<cfargument name="path" type="string" required="true">
 		<cfargument name="fileName" type="string" required="true">
 		<cfargument name="method" type="string" required="true">
 		<cfscript>
+			var returnValue = "";
 			var loc = {};
-			arguments.returnVariable = "loc.returnValue";
-			arguments.component = arguments.path & "." & arguments.fileName;
-			StructDelete(arguments, "path");
-			StructDelete(arguments, "fileName");
+			loc.returnVariable = "returnValue";
+			loc.method = arguments.method;
+			loc.component = ListChangeDelims(arguments.path, ".", "/") & "." & ListChangeDelims(arguments.fileName, ".", "/");
+			loc.argumentCollection = arguments;
 		</cfscript>
 		<cfinclude template="../../root.cfm">
-		<cfreturn loc.returnValue>
+		<cfreturn returnValue>
 	</cffunction>
 
 	<cffunction name="$copyTemplateMigrationAndRename" displayname="$copyTemplateMigrationAndRename" access="private" returntype="string">
@@ -222,11 +222,11 @@
 	<cffunction name="$getVersionsPreviouslyMigrated" access="private" returntype="string">
 		<cfset var loc = {}>
 		<cftry>
-			<cfquery name="loc.qMigratedVersions" datasource="#application.wheels.dataSourceName#" username="#application.wheels.dataSourceUserName#" password="#application.wheels.dataSourcePassword#">
+			<cfquery name="loc.qMigratedVersions" datasource="#application.wheels.dataSourceName#" >
 			SELECT version FROM schemainfo ORDER BY version ASC
 			</cfquery>
 			<cfcatch type="database">
-				<cfquery datasource="#application.wheels.dataSourceName#" username="#application.wheels.dataSourceUserName#" password="#application.wheels.dataSourcePassword#">
+				<cfquery datasource="#application.wheels.dataSourceName#" >
 				CREATE TABLE schemainfo (version VARCHAR(25))
 				</cfquery>
 				<cfreturn "0">

@@ -68,7 +68,7 @@
 		<cfargument name="columnType" type="string" required="yes" hint="column type">
 		<cfargument name="default" type="string" required="no" hint="default value">
 		<cfargument name="null" type="boolean" required="no" hint="whether nulls are allowed">
-		<cfargument name="limit" type="numeric" required="no" hint="character or integer size">
+		<cfargument name="limit" type="any" required="no" hint="character or integer size">
 		<cfargument name="precision" type="numeric" required="no" hint="number of digits the column can hold">
 		<cfargument name="scale" type="numeric" required="no" hint="number of digits that can be placed to the right of the decimal point (must be less than or equal to precision)">
 		<cfscript>
@@ -216,12 +216,29 @@
 	
 	<cffunction name="string" returntype="any" access="public" hint="adds string columns to table definition">
 		<cfargument name="columnNames" type="string" required="yes" hint="one or more column names, comma delimited">
-		<cfargument name="limit" type="numeric" required="no" hint="character limit">
+		<cfargument name="limit" type="any" required="no" hint="character limit">
 		<cfargument name="default" type="string" required="no" hint="default value">
 		<cfargument name="null" type="boolean" required="no" hint="whether nulls are allowed">
 		<cfscript>
 			var loc = {};
 			arguments.columnType = "string";
+			loc.iEnd = ListLen(arguments.columnNames);
+			for (loc.i=1; loc.i <= loc.iEnd; loc.i++) {
+				arguments.columnName = ListGetAt(arguments.columnNames,loc.i);
+				column(argumentCollection=arguments);
+			}
+		</cfscript>
+		<cfreturn this>
+	</cffunction>
+
+	<cffunction name="char" returntype="any" access="public" hint="adds char columns to table definition">
+		<cfargument name="columnNames" type="string" required="yes" hint="one or more column names, comma delimited">
+		<cfargument name="limit" type="any" required="no" hint="character limit">
+		<cfargument name="default" type="string" required="no" hint="default value">
+		<cfargument name="null" type="boolean" required="no" hint="whether nulls are allowed">
+		<cfscript>
+			var loc = {};
+			arguments.columnType = "char";
 			loc.iEnd = ListLen(arguments.columnNames);
 			for (loc.i=1; loc.i <= loc.iEnd; loc.i++) {
 				arguments.columnName = ListGetAt(arguments.columnNames,loc.i);
@@ -238,6 +255,22 @@
 		<cfscript>
 			var loc = {};
 			arguments.columnType = "text";
+			loc.iEnd = ListLen(arguments.columnNames);
+			for (loc.i=1; loc.i <= loc.iEnd; loc.i++) {
+				arguments.columnName = ListGetAt(arguments.columnNames,loc.i);
+				column(argumentCollection=arguments);
+			}
+		</cfscript>
+		<cfreturn this>
+	</cffunction>
+
+	<cffunction name="uniqueidentifier" returntype="any" access="public" hint="adds UUID columns to table definition">
+		<cfargument name="columnNames" type="string" required="yes" hint="one or more column names, comma delimited">
+		<cfargument name="default" type="string" required="no" hint="default value" default="newid()">
+		<cfargument name="null" type="boolean" required="no" hint="whether nulls are allowed">
+		<cfscript>
+			var loc = {};
+			arguments.columnType = "uniqueidentifier";
 			loc.iEnd = ListLen(arguments.columnNames);
 			for (loc.i=1; loc.i <= loc.iEnd; loc.i++) {
 				arguments.columnName = ListGetAt(arguments.columnNames,loc.i);

@@ -34,6 +34,14 @@
 		</cfscript>
 		<cfreturn CreateObject("component","TableDefinition").init(argumentCollection=arguments)>
 	</cffunction>
+
+	<cffunction name="createView" returntype="ViewDefinition" access="public" hint="creates a view definition object to store view properties">
+		<cfargument name="name" type="string" required="true" hint="view name">
+		<cfscript>
+			arguments.adapter = this.adapter;
+		</cfscript>
+		<cfreturn CreateObject("component","ViewDefinition").init(argumentCollection=arguments)>
+	</cffunction>
 	
 	<cffunction name="changeTable" returntype="TableDefinition" access="public" hint="creates a table definition object to store modifications to table properties">
 		<cfargument name="name" type="string" required="true" hint="table name in pluralized form">
@@ -52,18 +60,26 @@
 	<cffunction name="dropTable" returntype="void" access="public" hint="drops a table from the database">
 		<cfargument name="name" type="string" required="true" hint="table name">
 		<cfscript>
-    	var loc = {};
-    	if (application.wheels.serverName != "railo")
-    	{
-				loc.foreignKeys = $getForeignKeys(arguments.name);
-				loc.iEnd = ListLen(loc.foreignKeys);
-    		for (loc.i=1; loc.i <= loc.iEnd; loc.i++) {
-    			loc.foreignKeyName = ListGetAt(loc.foreignKeys,loc.i);
-    			dropForeignKey(table=arguments.name,keyname=loc.foreignKeyName);
-    		}
-    	}
-	    $execute(this.adapter.dropTable(name=arguments.name));
-	    announce("Dropped table #arguments.name#");
+	    	var loc = {};
+	    	if (application.wheels.serverName != "railo")
+	    	{
+					loc.foreignKeys = $getForeignKeys(arguments.name);
+					loc.iEnd = ListLen(loc.foreignKeys);
+	    		for (loc.i=1; loc.i <= loc.iEnd; loc.i++) {
+	    			loc.foreignKeyName = ListGetAt(loc.foreignKeys,loc.i);
+	    			dropForeignKey(table=arguments.name,keyname=loc.foreignKeyName);
+	    		}
+	    	}
+		    $execute(this.adapter.dropTable(name=arguments.name));
+		    announce("Dropped table #arguments.name#");
+		</cfscript>
+	</cffunction>
+
+	<cffunction name="dropView" returntype="void" access="public" hint="drops a view from the database">
+		<cfargument name="name" type="string" required="true" hint="view name">
+		<cfscript>
+	    $execute(this.adapter.dropView(name=arguments.name));
+	    announce("Dropped view #arguments.name#");
 		</cfscript>
 	</cffunction>
 	

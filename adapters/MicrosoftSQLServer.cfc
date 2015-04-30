@@ -13,9 +13,28 @@
 	<cfset variables.sqlTypes['text'] = {name='TEXT'}>
 	<cfset variables.sqlTypes['time'] = {name='DATETIME'}>
 	<cfset variables.sqlTypes['timestamp'] = {name='DATETIME'}>
+	<cfset variables.sqlTypes['uniqueidentifier'] = {name='UNIQUEIDENTIFIER'} >
+	<cfset variables.sqlTypes['char'] = {name='CHAR',limit=10} >
 
 	<cffunction name="adapterName" returntype="string" access="public" hint="name of database adapter">
 		<cfreturn "MicrosoftSQLServer">
+	</cffunction>
+
+	<cffunction name="addForeignKeyOptions" returntype="string" access="public">
+		<cfargument name="sql" type="string" required="true" hint="column definition sql">
+		<cfargument name="options" type="struct" required="false" default="#StructNew()#" hint="column options">
+		<cfscript>
+			arguments.sql = arguments.sql & " FOREIGN KEY (" & arguments.options.column & ")";
+			if (StructKeyExists(arguments.options, "referenceTable")){
+				if (StructKeyExists(arguments.options, "referenceColumn")){
+					arguments.sql = arguments.sql & " REFERENCES ";
+					arguments.sql = arguments.sql & arguments.options.referenceTable;
+					arguments.sql = arguments.sql & " (" & arguments.options.referenceColumn & ")";
+				}
+			}
+		
+		</cfscript>
+		<cfreturn arguments.sql>
 	</cffunction>
 
 	<cffunction name="addPrimaryKeyOptions" returntype="string" access="public">
@@ -67,6 +86,18 @@
 	</cffunction>
 
 	<!--- createTable - use default --->
+
+	<cffunction name="createView" returntype="string" access="public" hint="generates sql to create a view">
+		<cfargument name="name" type="string" required="true" hint="view name">
+		<cfargument name="sql" type="string" required="true" hint="select sql">
+		<cfscript>
+		var loc = {};
+		loc.sql = "CREATE VIEW #quoteTableName(LCase(arguments.name))# AS ";
+		loc.sql = loc.sql & arguments.sql;
+		</cfscript>
+		<cfdump var="#loc.sql#" />
+		<cfreturn loc.sql>
+	</cffunction>
 	
 	<cffunction name="renameTable" returntype="string" access="public" hint="generates sql to rename a table">
 		<cfargument name="oldName" type="string" required="true" hint="old table name">
@@ -77,6 +108,11 @@
 	<cffunction name="dropTable" returntype="string" access="public" hint="generates sql to drop a table">
 		<cfargument name="name" type="string" required="true" hint="table name">
 		<cfreturn "IF EXISTS(SELECT name FROM sysobjects WHERE name = N'#LCase(arguments.name)#' AND xtype='U') DROP TABLE #quoteTableName(LCase(arguments.name))#">
+	</cffunction>
+
+	<cffunction name="dropView" returntype="string" access="public" hint="generates sql to drop a view">
+		<cfargument name="name" type="string" required="true" hint="view name">
+		<cfreturn "IF EXISTS(SELECT name FROM sysobjects WHERE name = N'#LCase(arguments.name)#' AND xtype='V') DROP VIEW #quoteTableName(LCase(arguments.name))#">
 	</cffunction>
 	
 	<cffunction name="addColumnToTable" returntype="string" access="public" hint="generates sql to add a new column to a table">
@@ -129,7 +165,7 @@
 		<cfargument name="name" type="string" required="true" hint="table name">
 		<cfargument name="columnName" type="any" required="true" hint="column name">
 		<cfset var loc = {}>
-		<cfquery name="loc.constraints" datasource="#application.wheels.dataSourceName#" username="#application.wheels.dataSourceUserName#" password="#application.wheels.dataSourcePassword#">
+		<cfquery name="loc.constraints" datasource="#application.wheels.dataSourceName#" >
 			SELECT
 				constraint_name
 			FROM
@@ -151,7 +187,7 @@
 		<cfargument name="name" type="string" required="true" hint="table name">
 		<cfargument name="columnName" type="any" required="true" hint="column name">
 		<cfset var loc = {}>
-		<cfquery name="loc.constraints" datasource="#application.wheels.dataSourceName#" username="#application.wheels.dataSourceUserName#" password="#application.wheels.dataSourcePassword#">
+		<cfquery name="loc.constraints" datasource="#application.wheels.dataSourceName#" >
 			EXEC sp_helpconstraint #quoteTableName(LCase(arguments.name))#, 'nomsg'
 		</cfquery>
 		<cfif StructKeyExists(loc, "constraints") And loc.constraints.RecordCount NEQ "" And loc.constraints.RecordCount GT 0>
@@ -175,7 +211,7 @@
 		<cfargument name="columnName" type="any" required="true" hint="column name">
 		<cfset var loc = {}>
 		<!--- Based on info presented in `http://stackoverflow.com/questions/765867/list-of-all-index-index-columns-in-sql-server-db` --->
-		<cfquery name="loc.indexes" datasource="#application.wheels.dataSourceName#" username="#application.wheels.dataSourceUserName#" password="#application.wheels.dataSourcePassword#">
+		<cfquery name="loc.indexes" datasource="#application.wheels.dataSourceName#" >
 			SELECT
 				t.name AS table_name,
 				col.name AS column_name,
