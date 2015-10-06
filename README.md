@@ -31,7 +31,11 @@ I have tested this plugin on the following CFML Engines:
 * Railo 3.2.3+
 
 ## Installation
-Once you have one a CFML engine correctly configured and operating on your system, you can place this plugin into your /plugins directory that's found in the root of your ColdFusion on Wheels application.  Reload your application using the Reload link in the footer and you'll now see a "dbmigrate" link for you to use the plugin.
+There are two ways to install this plugin with your CFWheels application.
+
+1. Download the latest release of this plugin as a ZIP file from https://github.com/tdm00/cfwheels-dbmigrate-plugin/releases/. Unzip this ZIP file and rename the directory `dbmigrate`. Move the directory to the `/plugins` directory of your application. After you've done this correctly you should have the path `/plugins/dbmigrate/Base.cfc` for example.
+
+2. Clone this project into a `dbmigrate` directory within your applications `/plugins` directory. From a Mac / Linux command line change to the `/plugins` directory and then execute `git clone git@github.com:tdm00/cfwheels-dbmigrate-plugin.git dbmigrate`. 
 
 ## Special Thanks
 Just want to acknowledge, and thanks, everyone that's helped with this plugin.  While I don't have a complete list of names, I did want to mention:
