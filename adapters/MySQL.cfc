@@ -10,6 +10,7 @@
 	<cfset variables.sqlTypes['float'] = {name='FLOAT'}>
 	<cfset variables.sqlTypes['integer'] = {name='INT'}>
 	<cfset variables.sqlTypes['string'] = {name='VARCHAR',limit=255}>
+	<cfset variables.sqlTypes['char'] = {name='CHAR',limit=255}>
 	<cfset variables.sqlTypes['text'] = {name='TEXT'}>
 	<cfset variables.sqlTypes['time'] = {name='TIME'}>
 	<cfset variables.sqlTypes['timestamp'] = {name='TIMESTAMP'}>
